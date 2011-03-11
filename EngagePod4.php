@@ -8,25 +8,13 @@ class EngagePod4 {
     private $_jsessionid;
     private $_username;
     private $_password;
-    private $_databases;
-    private $_selectedDatabaseName;
     
     public function __construct($username, $password) {
         // It would be a good thing to cache the jsessionid somewhere and reuse it across multiple requests
         // otherwise we are authenticating to the server once for every request
         $this->_login($username, $password);
-        //$this->_jsessionid = '796EE82039AC371C1F673AFA6522721C';
-        //$this->_session_encoding = ';jsessionid=796EE82039AC371C1F673AFA6522721C';
     }
 
-    public function selectDatabase($databaseName) {
-        
-    }
-    
-    public function selectList($listName) {
-        
-    }
-    
     public function select($databaseName, $listName) {
         $this->useDatabase($databaseName);
         $this->useList($listName);
@@ -44,11 +32,11 @@ class EngagePod4 {
         18 Ð Contact Lists
      * 
      */
-    public function getLists($listType = 2, $visibility = 0) {
+    public function getLists($listType = 2, $isPrivate = true) {
         $data["Envelope"] = array(
             "Body" => array(
                 "GetLists" => array(
-                    "VISIBILITY" => $visibility,
+                    "VISIBILITY" => ($isPrivate ? '0' : '1'),
                     "LIST_TYPE" => $listType,
                 ),
             ),
@@ -64,9 +52,6 @@ class EngagePod4 {
         } else {
             throw new Exception("GetLists Error: ".$this->_getErrorFromResponse($response));
         }
-    }
-    
-    public function getContacts() {
     }
     
     public function addContact($databaseID, $updateIfFound, $columns) {
@@ -225,7 +210,7 @@ class EngagePod4 {
 
 // For debugging
 function d($obj) {
-    if (true) {
+    if (false) {
         ini_set("xdebug.var_display_max_data", 10000);
         ini_set("xdebug.var_display_max_depth", 10);
         ini_set("xdebug.var_display_max_children", 1000); 
