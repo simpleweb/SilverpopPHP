@@ -120,10 +120,10 @@ class EngagePod4 {
                 return $result['ListId'];
             else {
                 d($response);
-                throw new Exception('Recipient added but no recipient ID was returned from the server.');
+                throw new Exception('Query created but no query ID was returned from the server.');
             }
         } else {
-            throw new Exception("AddRecipient Error: ".$this->_getErrorFromResponse($response));
+            throw new Exception("createQuery Error: ".$this->_getErrorFromResponse($response));
         }
     }
 
