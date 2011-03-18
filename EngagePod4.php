@@ -83,6 +83,51 @@ class EngagePod4 {
     }
 
     /**
+     * Create a new query
+     *
+     * Takes a list of criteria and creates a query from them
+     *
+     * @param string $queryName The name of the new query
+     * @param int $parentListId List that this query is derived from
+     * @param string $columnName Column that the expression will run against
+     * @param string $operators Operator that will be used for the expression
+     * @param string $values
+     * @param bool $isPrivate
+     * @return int ListID of the query that was created
+     */
+    public function createQuery($queryName, $parentListId, $columnName, $operators, $values, $isPrivate = true) {
+        $data['Envelope'] = array(
+            'Body' => array(
+                'CreateQuery' => array(
+                    'QUERY_NAME' => $queryName,
+                    'PARENT_LIST_ID' => $parentListId,
+                    'VISIBILITY' => ($isPrivate ? '0' : '1'),
+                    'EXPRESSION' => array(
+                        'TYPE' => 'TE',
+                        'COLUMN_NAME' => $columnName,
+                        'OPERATORS' => $operators,
+                        'VALUES' => $values,
+                    ),
+                ),
+            ),
+        );
+
+        $response = $this->_request($data);
+        $result = $response["Envelope"]["Body"]["RESULT"];
+
+        if ($this->_isSuccess($result)) {
+            if (isset($result['ListId']))
+                return $result['ListId'];
+            else {
+                d($response);
+                throw new Exception('Recipient added but no recipient ID was returned from the server.');
+            }
+        } else {
+            throw new Exception("AddRecipient Error: ".$this->_getErrorFromResponse($response));
+        }
+    }
+
+    /**
      * $templateID - ID of template upon which to base the mailing.
      * $targetID - ID of database, query, or contact list to send the template-based mailing.
      * $mailingName - Name to assign to the generated mailing.
