@@ -102,11 +102,14 @@ class EngagePod4 {
                     'QUERY_NAME' => $queryName,
                     'PARENT_LIST_ID' => $parentListId,
                     'VISIBILITY' => ($isPrivate ? '0' : '1'),
-                    'EXPRESSION' => array(
-                        'TYPE' => 'TE',
-                        'COLUMN_NAME' => $columnName,
-                        'OPERATORS' => $operators,
-                        'VALUES' => $values,
+                    'CRITERIA' => array(
+                      'TYPE' => 'editable',
+                      'EXPRESSION' => array(
+                          'TYPE' => 'TE',
+                          'COLUMN_NAME' => $columnName,
+                          'OPERATORS' => $operators,
+                          'VALUES' => $values,
+                      ),
                     ),
                 ),
             ),
