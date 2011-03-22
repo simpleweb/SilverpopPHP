@@ -131,20 +131,30 @@ class EngagePod4 {
     }
 
     /**
-     * $templateID - ID of template upon which to base the mailing.
-     * $targetID - ID of database, query, or contact list to send the template-based mailing.
-     * $mailingName - Name to assign to the generated mailing.
-     * $scheduledTimestamp - When the mailing should be scheduled to send. This must be later than the current timestamp.
-     * $optionalElements - An array of $key => $value, where $key can be one of
-     * 						SEND_HTML,
-     * 						SEND_AOL,
-     * 						SEND_TEXT,
-     * 						SUBJECT,
-     * 						FROM_NAME,
-     * 						FROM_ADDRESS,
-     * 						REPLY_TO
-     * $saveToSharedFolder - true/false
+     * Send email
      *
+     * Sends an email to the specified list_id ($targetID) using the template
+     * $templateID. You can optionally include substitutions that will act on
+     * the template to fill in dynamic bits of data.
+     *
+     * ## Example
+     *
+     *     $engage->sendEmail(123, 456, "Example Mailing with unique name", time() + 60, array(
+     *         'SUBSTITUTIONS' => array(
+     *             array(
+     *                 'NAME' => 'FIELD_IN_TEMPLATE',
+     *                 'VALUE' => "Dynamic value to replace in template",
+     *             ),
+     *         )
+     *     ));
+     *
+     * @param int $templateID ID of template upon which to base the mailing.
+     * @param int $targetID ID of database, query, or contact list to send the template-based mailing.
+     * @param string $mailingName Name to assign to the generated mailing.
+     * @param int $scheduledTimestamp When the mailing should be scheduled to send. This must be later than the current timestamp.
+     * @param array $optionalElements An array of $key => $value, where $key can be one of SUBJECT, FROM_NAME, FROM_ADDRESS, REPLY_TO, SUBSTITUTIONS
+     * @param bool $saveToSharedFolder
+     * @return int $mailingID
      */
     public function sendEmail($templateID, $targetID, $mailingName, $scheduledTimestamp, $optionalElements = array(), $saveToSharedFolder = 0) {
         $data["Envelope"] = array(
