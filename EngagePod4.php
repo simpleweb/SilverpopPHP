@@ -150,6 +150,8 @@ class EngagePod4 {
         $data["Envelope"] = array(
             "Body" => array(
                 "ScheduleMailing" => array(
+                    "SEND_HTML" => true,
+                    "SEND_TEXT" => true,
                     "TEMPLATE_ID" => $templateID,
                     "LIST_ID" => $targetID,
                     "MAILING_NAME" => $mailingName,
