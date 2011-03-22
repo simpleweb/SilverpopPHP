@@ -3,6 +3,15 @@
 require_once 'EngagePod4/xmlLib.php';
 
 class EngagePod4 {
+    /**
+     * Current version of the library
+     *
+     * Uses semantic versioning (http://semver.org/)
+     *
+     * @const string VERSION
+     */
+    const VERSION = '0.0.1';
+
     private $_baseUrl = 'http://api4.silverpop.com/XMLAPI';
     private $_session_encoding;
     private $_jsessionid;
