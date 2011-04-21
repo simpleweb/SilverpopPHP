@@ -30,15 +30,16 @@ class EngagePod4 {
     }
 
     /**
-     * $listType can be one of
-     0 - Databases
-     1 - Queries
-     2 - Both Databases and Queries
-     5 - Test Lists
-     6 - Seed Lists
-     13 - Suppression Lists
-     15 - Relational Tables
-     18 - Contact Lists
+     * $listType can be one of:
+     *
+     * 0 - Databases
+     * 1 - Queries
+     * 2 - Both Databases and Queries
+     * 5 - Test Lists
+     * 6 - Seed Lists
+     * 13 - Suppression Lists
+     * 15 - Relational Tables
+     * 18 - Contact Lists
      *
      */
     public function getLists($listType = 2, $isPrivate = true) {
