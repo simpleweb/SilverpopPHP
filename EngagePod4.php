@@ -83,7 +83,6 @@ class EngagePod4 {
             if (isset($result['RecipientId']))
                 return $result['RecipientId'];
             else {
-                d($response);
                 throw new Exception('Recipient added but no recipient ID was returned from the server.');
             }
         } else {
@@ -131,7 +130,6 @@ class EngagePod4 {
             if (isset($result['ListId']))
                 return $result['ListId'];
             else {
-                d($response);
                 throw new Exception('Query created but no query ID was returned from the server.');
             }
         } else {
@@ -265,7 +263,6 @@ class EngagePod4 {
         if (isset($response['Envelope']['Body']['Fault']['FaultString']) && !empty($response['Envelope']['Body']['Fault']['FaultString'])) {
             return $response['Envelope']['Body']['Fault']['FaultString'];
         }
-        d($response['Envelope']);
         return 'Unknown Server Error';
     }
 
@@ -276,14 +273,3 @@ class EngagePod4 {
         return false;
     }
 }
-
-// For debugging
-function d($obj) {
-    if (false) {
-        ini_set("xdebug.var_display_max_data", 10000);
-        ini_set("xdebug.var_display_max_depth", 10);
-        ini_set("xdebug.var_display_max_children", 1000);
-        var_dump($obj);
-    }
-}
-
