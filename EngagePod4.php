@@ -10,7 +10,7 @@ class EngagePod4 {
      *
      * @const string VERSION
      */
-    const VERSION = '0.0.1';
+    const VERSION = '0.0.2';
 
     private $_baseUrl = 'http://api4.silverpop.com/XMLAPI';
     private $_session_encoding;
@@ -30,15 +30,16 @@ class EngagePod4 {
     }
 
     /**
-     * $listType can be one of
-     0 - Databases
-     1 - Queries
-     2 - Both Databases and Queries
-     5 - Test Lists
-     6 - Seed Lists
-     13 - Suppression Lists
-     15 - Relational Tables
-     18 - Contact Lists
+     * $listType can be one of:
+     *
+     * 0 - Databases
+     * 1 - Queries
+     * 2 - Both Databases and Queries
+     * 5 - Test Lists
+     * 6 - Seed Lists
+     * 13 - Suppression Lists
+     * 15 - Relational Tables
+     * 18 - Contact Lists
      *
      */
     public function getLists($listType = 2, $isPrivate = true) {
@@ -83,7 +84,6 @@ class EngagePod4 {
             if (isset($result['RecipientId']))
                 return $result['RecipientId'];
             else {
-                d($response);
                 throw new Exception('Recipient added but no recipient ID was returned from the server.');
             }
         } else {
@@ -131,7 +131,6 @@ class EngagePod4 {
             if (isset($result['ListId']))
                 return $result['ListId'];
             else {
-                d($response);
                 throw new Exception('Query created but no query ID was returned from the server.');
             }
         } else {
@@ -265,7 +264,6 @@ class EngagePod4 {
         if (isset($response['Envelope']['Body']['Fault']['FaultString']) && !empty($response['Envelope']['Body']['Fault']['FaultString'])) {
             return $response['Envelope']['Body']['Fault']['FaultString'];
         }
-        d($response['Envelope']);
         return 'Unknown Server Error';
     }
 
@@ -276,14 +274,3 @@ class EngagePod4 {
         return false;
     }
 }
-
-// For debugging
-function d($obj) {
-    if (false) {
-        ini_set("xdebug.var_display_max_data", 10000);
-        ini_set("xdebug.var_display_max_depth", 10);
-        ini_set("xdebug.var_display_max_children", 1000);
-        var_dump($obj);
-    }
-}
-
