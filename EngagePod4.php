@@ -10,7 +10,7 @@ class EngagePod4 {
      *
      * @const string VERSION
      */
-    const VERSION = '0.0.1';
+    const VERSION = '0.0.2';
 
     private $_baseUrl = 'http://api4.silverpop.com/XMLAPI';
     private $_session_encoding;
