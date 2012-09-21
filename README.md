@@ -10,8 +10,6 @@ PHP client library for the Silverpop API
 // Include the library
 require_once 'library/EngagePod4.php';
 
-$username = "";
-$password = "";
 $databaseID = "";
 $mailingID = "";
 $contactsList = "";
