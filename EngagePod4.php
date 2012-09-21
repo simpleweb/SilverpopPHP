@@ -194,6 +194,74 @@ class EngagePod4 {
         }
     }
 
+    /**
+    * Import a table
+    *
+    * Requires a file to import and a mapping file to be in the 'upload' directory of the Engage FTP server
+    *
+    * Returns the data job id
+    *
+    */
+    public function importTable($fileName, $mapFileName) {
+
+        $data["Envelope"] = array(
+            "Body" => array(
+                "ImportTable" => array(
+                    "MAP_FILE" => $mapFileName,
+                    "SOURCE_FILE" => $fileName,
+                ),
+            ),
+        );
+
+        $response = $this->_request($data);
+        $result = $response["Envelope"]["Body"]["RESULT"];
+
+        if ($this->_isSuccess($result)) {
+            if (isset($result['JOB_ID']))
+                return $result['JOB_ID'];
+            else {
+                throw new Exception('Import table query created but no job ID was returned from the server.');
+            }
+        } else {
+            throw new Exception("importTable Error: ".$this->_getErrorFromResponse($response));
+        }
+
+    }
+
+    /**
+    * Purge a table
+    *
+    * Clear the contents of a table, useful before importing new content
+    *
+    * Returns the data job id
+    *
+    */
+    public function purgeTable($tableName, $isPrivate = true) {
+
+        $data["Envelope"] = array(
+            "Body" => array(
+                "PurgeTable" => array(
+                    "TABLE_NAME" => $tableName,
+                    "TABLE_VISIBILITY" => ($isPrivate ? '0' : '1'),
+                ),
+            ),
+        );
+
+        $response = $this->_request($data);
+        $result = $response["Envelope"]["Body"]["RESULT"];
+
+        if ($this->_isSuccess($result)) {
+            if (isset($result['JOB_ID']))
+                return $result['JOB_ID'];
+            else {
+                throw new Exception('Purge table query created but no job ID was returned from the server.');
+            }
+        } else {
+            throw new Exception("purgeTable Error: ".$this->_getErrorFromResponse($response));
+        }
+
+    }
+
     /* Private Functions */
 
     private function _login($username, $password) {
