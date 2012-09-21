@@ -4,13 +4,16 @@ Example:
 
 require_once 'library/EngagePod4.php';
 
-$username = "";
-$password = "";
 $databaseID = "";
 $mailingID = "";
 $contactsList = "";
 
-$pod = new EngagePod4($username,$password);
+$pod = new EngagePod4(array(
+  'username'       => 'XXX',
+  'password'       => 'XXX',
+  'engage_server'  => 4,
+));
+
 $lists = $pod->GetLists(18);
 var_dump($lists);
 
