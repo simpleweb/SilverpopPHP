@@ -12,16 +12,19 @@ class EngagePod4 {
      */
     const VERSION = '0.0.2';
 
-    private $_baseUrl = 'http://api4.silverpop.com/XMLAPI';
+    private $_baseUrl;
     private $_session_encoding;
     private $_jsessionid;
     private $_username;
     private $_password;
 
-    public function __construct($username, $password) {
+    public function __construct($config) {
+
         // It would be a good thing to cache the jsessionid somewhere and reuse it across multiple requests
         // otherwise we are authenticating to the server once for every request
-        $this->_login($username, $password);
+        $this->_baseUrl = 'http://api' . $config['engage_server'] . '.silverpop.com/XMLAPI';
+        $this->_login($config['username'], $config['password']);
+
     }
 
     public function select($databaseName, $listName) {
