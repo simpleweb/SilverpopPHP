@@ -265,6 +265,37 @@ class EngagePod4 {
 
     }
 
+    /**
+    * Get a data job status
+    *
+    * Returns the status or throws an excption
+    *
+    */
+    public function getJobStatus($jobId) {
+
+        $data["Envelope"] = array(
+            "Body" => array(
+                "GetJobStatus" => array(
+                    "JOB_ID" => $jobId
+                ),
+            ),
+        );
+
+        $response = $this->_request($data);
+        $result = $response["Envelope"]["Body"]["RESULT"];
+
+        if ($this->_isSuccess($result)) {
+            if (isset($result['JOB_STATUS']))
+                return $result['JOB_STATUS'];
+            else {
+                throw new Exception('Job status query was successful but no status was found;');
+            }
+        } else {
+            throw new Exception("getJobStatus Error: ".$this->_getErrorFromResponse($response));
+        }
+
+    }
+
     /* Private Functions */
 
     private function _login($username, $password) {
