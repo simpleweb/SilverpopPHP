@@ -3,6 +3,7 @@
 require_once 'EngagePod4/xmlLib.php';
 
 class EngagePod4 {
+
     /**
      * Current version of the library
      *
@@ -18,6 +19,11 @@ class EngagePod4 {
     private $_username;
     private $_password;
 
+    /**
+     * Constructor
+     * 
+     * Sets $this->_baseUrl based on the engage server specified in config
+     */
     public function __construct($config) {
 
         // It would be a good thing to cache the jsessionid somewhere and reuse it across multiple requests
@@ -33,6 +39,8 @@ class EngagePod4 {
     }
 
     /**
+     * Fetches the contents of a list
+     * 
      * $listType can be one of:
      *
      * 0 - Databases
@@ -67,6 +75,9 @@ class EngagePod4 {
         }
     }
 
+    /**
+     * Add a contact to a list
+     */
     public function addContact($databaseID, $updateIfFound, $columns) {
         $data["Envelope"] = array(
             "Body" => array(
