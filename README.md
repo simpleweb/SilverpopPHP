@@ -10,23 +10,24 @@ PHP client library for the Silverpop API
 // Include the library
 require_once 'lib/EngagePod4.php';
 
-$databaseID   = '';
-$mailingID    = '';
-$contactsList = '';
+// Set some useful variables
+$databaseID   = 'XXX';
+$templateID   = 'XXX';
+$contactsList = 'XXX';
 
 // Initialize the library
-$pod = new EngagePod4(array(
+$silverpop = new EngagePod4(array(
   'username'       => 'XXX',
   'password'       => 'XXX',
   'engage_server'  => 4,
 ));
 
 // Fetch all contact lists
-$lists = $pod->GetLists(18);
+$lists = $silverpop->GetLists(18);
 var_dump($lists);
 
 // Add a record to a contact
-$recipientID = $pod->addContact(
+$recipientID = $silverpop->addContact(
   $databaseID,
   true,
   array(
@@ -34,13 +35,14 @@ $recipientID = $pod->addContact(
     'email' => 'chris@simpleweb.co.uk',
   )
 );
+echo $recipientID;
 
 // Create a new mailing and send in 1 minute
-$mailingID = $pod->sendEmail(
-  $mailingID,
+$mailingID = $silverpop->sendEmail(
+  $templateID,
   $databaseID,
   'API Mailing Test - ' . date("d/m/Y H:i:s", time()),
   time() + 60,
 );
-var_dump($mailingID);
+echo $mailingID;
 ```

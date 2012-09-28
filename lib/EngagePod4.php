@@ -3,6 +3,7 @@
 require_once 'EngagePod4/xmlLib.php';
 
 class EngagePod4 {
+
     /**
      * Current version of the library
      *
@@ -18,6 +19,11 @@ class EngagePod4 {
     private $_username;
     private $_password;
 
+    /**
+     * Constructor
+     * 
+     * Sets $this->_baseUrl based on the engage server specified in config
+     */
     public function __construct($config) {
 
         // It would be a good thing to cache the jsessionid somewhere and reuse it across multiple requests
@@ -33,6 +39,8 @@ class EngagePod4 {
     }
 
     /**
+     * Fetches the contents of a list
+     * 
      * $listType can be one of:
      *
      * 0 - Databases
@@ -67,6 +75,9 @@ class EngagePod4 {
         }
     }
 
+    /**
+     * Add a contact to a list
+     */
     public function addContact($databaseID, $updateIfFound, $columns) {
         $data["Envelope"] = array(
             "Body" => array(
@@ -261,6 +272,37 @@ class EngagePod4 {
             }
         } else {
             throw new Exception("purgeTable Error: ".$this->_getErrorFromResponse($response));
+        }
+
+    }
+
+    /**
+    * Get a data job status
+    *
+    * Returns the status or throws an excption
+    *
+    */
+    public function getJobStatus($jobId) {
+
+        $data["Envelope"] = array(
+            "Body" => array(
+                "GetJobStatus" => array(
+                    "JOB_ID" => $jobId
+                ),
+            ),
+        );
+
+        $response = $this->_request($data);
+        $result = $response["Envelope"]["Body"]["RESULT"];
+
+        if ($this->_isSuccess($result)) {
+            if (isset($result['JOB_STATUS']))
+                return $result['JOB_STATUS'];
+            else {
+                throw new Exception('Job status query was successful but no status was found;');
+            }
+        } else {
+            throw new Exception("getJobStatus Error: ".$this->_getErrorFromResponse($response));
         }
 
     }
