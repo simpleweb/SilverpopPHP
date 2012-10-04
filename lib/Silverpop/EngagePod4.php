@@ -1,6 +1,8 @@
 <?php
 
-require_once 'EngagePod4/xmlLib.php';
+namespace Silverpop;
+
+use Silverpop\EngagePod4\ArrayToXML;
 
 class EngagePod4 {
     /**
@@ -63,7 +65,7 @@ class EngagePod4 {
                 return array(); //?
             }
         } else {
-            throw new Exception("GetLists Error: ".$this->_getErrorFromResponse($response));
+            throw new \Exception("GetLists Error: ".$this->_getErrorFromResponse($response));
         }
     }
 
@@ -87,10 +89,10 @@ class EngagePod4 {
             if (isset($result['RecipientId']))
                 return $result['RecipientId'];
             else {
-                throw new Exception('Recipient added but no recipient ID was returned from the server.');
+                throw new \Exception('Recipient added but no recipient ID was returned from the server.');
             }
         } else {
-            throw new Exception("AddRecipient Error: ".$this->_getErrorFromResponse($response));
+            throw new \Exception("AddRecipient Error: ".$this->_getErrorFromResponse($response));
         }
     }
 
@@ -134,10 +136,10 @@ class EngagePod4 {
             if (isset($result['ListId']))
                 return $result['ListId'];
             else {
-                throw new Exception('Query created but no query ID was returned from the server.');
+                throw new \Exception('Query created but no query ID was returned from the server.');
             }
         } else {
-            throw new Exception("createQuery Error: ".$this->_getErrorFromResponse($response));
+            throw new \Exception("createQuery Error: ".$this->_getErrorFromResponse($response));
         }
     }
 
@@ -191,9 +193,9 @@ class EngagePod4 {
             if (isset($result['MAILING_ID']))
                 return $result['MAILING_ID'];
             else
-                throw new Exception('Email scheduled but no mailing ID was returned from the server.');
+                throw new \Exception('Email scheduled but no mailing ID was returned from the server.');
         } else {
-            throw new Exception("SendEmail Error: ".$this->_getErrorFromResponse($response));
+            throw new \Exception("SendEmail Error: ".$this->_getErrorFromResponse($response));
         }
     }
 
@@ -223,10 +225,10 @@ class EngagePod4 {
             if (isset($result['JOB_ID']))
                 return $result['JOB_ID'];
             else {
-                throw new Exception('Import table query created but no job ID was returned from the server.');
+                throw new \Exception('Import table query created but no job ID was returned from the server.');
             }
         } else {
-            throw new Exception("importTable Error: ".$this->_getErrorFromResponse($response));
+            throw new \Exception("importTable Error: ".$this->_getErrorFromResponse($response));
         }
 
     }
@@ -257,10 +259,10 @@ class EngagePod4 {
             if (isset($result['JOB_ID']))
                 return $result['JOB_ID'];
             else {
-                throw new Exception('Purge table query created but no job ID was returned from the server.');
+                throw new \Exception('Purge table query created but no job ID was returned from the server.');
             }
         } else {
-            throw new Exception("purgeTable Error: ".$this->_getErrorFromResponse($response));
+            throw new \Exception("purgeTable Error: ".$this->_getErrorFromResponse($response));
         }
 
     }
@@ -284,7 +286,7 @@ class EngagePod4 {
             $this->_username = $username;
             $this->_password = $password;
         } else {
-            throw new Exception("Login Error: ".$this->_getErrorFromResponse($response));
+            throw new \Exception("Login Error: ".$this->_getErrorFromResponse($response));
         }
     }
 
@@ -300,14 +302,14 @@ class EngagePod4 {
         );
         $response = $this->_httpPost($fields);
         if ($response) {
-            $arr = xml2array($response);
+            $arr = ArrayToXML::xml2array($response);
             if (isset($arr["Envelope"]["Body"]["RESULT"]["SUCCESS"])) {
                 return $arr;
             } else {
-                throw new Exception("HTTP Error: Invalid data from the server");
+                throw new \Exception("HTTP Error: Invalid data from the server");
             }
         } else {
-            throw new Exception("HTTP request failed");
+            throw new \Exception("HTTP request failed");
         }
     }
 
