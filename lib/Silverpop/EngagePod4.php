@@ -201,6 +201,53 @@ class EngagePod4 {
     }
 
     /**
+     * Send a single transactional email
+     *
+     * Sends an email to the specified email address ($emailID) using the mailingId
+     * of the autoresponder $mailingID. You can optionally include database keys
+     * to match if multikey database is used (not for replacement).
+     *
+     * ## Example
+     *
+     *     $engage->sendMailing("someone@somedomain.com", 149482, array("COLUMNS" => array(
+     *         'COLUMN' => array(
+     *             array(
+     *                 'Name' => 'FIELD_IN_TEMPLATE',
+     *                 'Value' => "value to MATCH",
+     *             ),
+     *         )
+     *     )));
+     *
+     * @param string $emailID ID of users email, must be opted in.
+     * @param int $mailingID ID of template upon which to base the mailing.
+     * @param array $optionalKeys additional keys to match reciepent 
+     * @return int $mailingID
+     */
+    public function sendMailing($emailID, $mailingID, $optionalKeys = array()) {
+        $data["Envelope"] = array(
+            "Body" => array(
+                "SendMailing" => array(
+                    "MailingId"         => $mailingID,
+                    "RecipientEmail"    => $emailID, 
+                ),
+            ),
+        );
+        foreach ($optionalKeys as $key => $value) {
+            $data["Envelope"]["Body"]["SendMailing"][$key] = $value;
+        }
+
+        $response = $this->_request($data);
+        $result = $response["Envelope"]["Body"]["RESULT"];
+
+        if ($this->_isSuccess($result)) {
+            return true;
+        } else {
+            throw new \Exception("SendEmail Error: ".$this->_getErrorFromResponse($response));
+        }
+    }
+        
+
+    /**
     * Import a table
     *
     * Requires a file to import and a mapping file to be in the 'upload' directory of the Engage FTP server
@@ -296,10 +343,21 @@ class EngagePod4 {
     }
 
     private function _request($data) {
-        $atx = new ArrayToXML( $data, array(), array() );
+        if(is_array($data))
+        {
+            $atx = new ArrayToXML( $data, array(), array() );
+            $xml = $atx->getXML();
+        }
+        else
+        {
+            //assume raw xml otherwise, we need this because we have to build
+            //  our own sometimes because assoc arrays don't support same name keys
+            $xml = $data;
+        }
+
         $fields = array(
             "jsessionid" => isset($this->_jsessionid) ? $this->_jsessionid : '',
-            "xml" => $atx->getXML(),
+            "xml" => $xml,
         );
         $response = $this->_httpPost($fields);
         if ($response) {
