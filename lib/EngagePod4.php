@@ -204,13 +204,13 @@ class EngagePod4 {
     }
 
     /**
-    * Import a table
-    *
-    * Requires a file to import and a mapping file to be in the 'upload' directory of the Engage FTP server
-    *
-    * Returns the data job id
-    *
-    */
+     * Import a table
+     *
+     * Requires a file to import and a mapping file to be in the 'upload' directory of the Engage FTP server
+     *
+     * Returns the data job id
+     *
+     */
     public function importTable($fileName, $mapFileName) {
 
         $data["Envelope"] = array(
@@ -238,13 +238,13 @@ class EngagePod4 {
     }
 
     /**
-    * Purge a table
-    *
-    * Clear the contents of a table, useful before importing new content
-    *
-    * Returns the data job id
-    *
-    */
+     * Purge a table
+     *
+     * Clear the contents of a table, useful before importing new content
+     *
+     * Returns the data job id
+     *
+     */
     public function purgeTable($tableName, $isPrivate = true) {
 
         $data["Envelope"] = array(
@@ -272,11 +272,11 @@ class EngagePod4 {
     }
 
     /**
-    * Get a data job status
-    *
-    * Returns the status or throws an excption
-    *
-    */
+     * Get a data job status
+     *
+     * Returns the status or throws an exception
+     *
+     */
     public function getJobStatus($jobId) {
 
         $data["Envelope"] = array(
@@ -302,8 +302,10 @@ class EngagePod4 {
 
     }
 
-    /* Private Functions */
-
+    /**
+     * Private method: authenticate with Silverpop
+     *
+     */
     private function _login($username, $password) {
         $data["Envelope"] = array(
             "Body" => array(
@@ -325,10 +327,18 @@ class EngagePod4 {
         }
     }
 
+    /**
+     * Private method: generate the full request url
+     *
+     */
     private function _getFullUrl() {
         return $this->_baseUrl . (isset($this->_session_encoding) ? $this->_session_encoding : '');
     }
 
+    /**
+     * Private method: make the request
+     *
+     */
     private function _request($data) {
         $atx = new ArrayToXML( $data, array(), array() );
         $fields = array(
@@ -348,6 +358,10 @@ class EngagePod4 {
         }
     }
 
+    /**
+     * Private method: post the request to the url
+     *
+     */
     private function _httpPost($fields) {
         $fields_string = http_build_query($fields);
         //open connection
@@ -368,6 +382,10 @@ class EngagePod4 {
         return $result;
     }
 
+    /**
+     * Private method: parse an error response from Silverpop
+     *
+     */
     private function _getErrorFromResponse($response) {
         if (isset($response['Envelope']['Body']['Fault']['FaultString']) && !empty($response['Envelope']['Body']['Fault']['FaultString'])) {
             return $response['Envelope']['Body']['Fault']['FaultString'];
@@ -375,10 +393,15 @@ class EngagePod4 {
         return 'Unknown Server Error';
     }
 
+    /**
+     * Private method: determine whether a request was successful
+     *
+     */
     private function _isSuccess($result) {
         if (isset($result['SUCCESS']) && (strtolower($result["SUCCESS"]) === "true")) {
             return true;
         }
         return false;
     }
+
 }
