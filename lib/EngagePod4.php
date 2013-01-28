@@ -33,11 +33,6 @@ class EngagePod4 {
 
     }
 
-    public function select($databaseName, $listName) {
-        $this->useDatabase($databaseName);
-        $this->useList($listName);
-    }
-
     /**
      * Fetches the contents of a list
      * 
