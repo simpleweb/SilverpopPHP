@@ -97,6 +97,30 @@ class EngagePod4 {
         }
     }
 
+    public function getContact($databaseID, $email)
+    {
+        $data["Envelope"] = array(
+            "Body" => array(
+                "SelectRecipientData" => array(
+                    "LIST_ID" => $databaseID,
+                    "EMAIL"   => $email
+                ),
+            ),
+        );
+
+        $response = $this->_request($data);
+        $result = $response["Envelope"]["Body"]["RESULT"];
+        if ($this->_isSuccess($result)) {
+            if (isset($result['RecipientId']))
+                return $result;
+            else {
+                throw new \Exception('Recipient added but no recipient ID was returned from the server.');
+            }
+        } else {
+            throw new \Exception("AddRecipient Error: ".$this->_getErrorFromResponse($response));
+        }
+    }
+
     /**
      * Create a new query
      *
