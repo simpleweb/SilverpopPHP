@@ -433,7 +433,6 @@ class EngagePod4 {
             $this->_username = $username;
             $this->_password = $password;
         } else {
-        	var_dump($result);
             throw new \Exception("Login Error: ".$this->_getErrorFromResponse($response));
         }
     }
@@ -444,7 +443,6 @@ class EngagePod4 {
 
     private function _request($data) {
         $atx = new ArrayToXML( $data, array(), array() );
-        var_dump($atx->getXML());
         $fields = array(
             "jsessionid" => isset($this->_jsessionid) ? $this->_jsessionid : '',
             "xml" => $atx->getXML(),
