@@ -1,5 +1,5 @@
 <?php
-
+namespace Silverpop\Util;
 /*
 	Original source from: http://codes.myfreewares.com/php/XML/XML%20@=@%20Associative%20Array.php-file.html
 */

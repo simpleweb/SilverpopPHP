@@ -1,0 +1,24 @@
+{
+    "name": "ragezbla/SilverpopPHP",
+    "type": "library",
+    "description": "Silverpop API in php",
+    "keywords": ["Silverpop","email", "API", "XML-API"],
+    "homepage": "https://github.com/RageZBla/SilverpopPHP",
+    "license": "GPL",
+    "authors": [
+        {
+            "name": "Olivier Lechevalier",
+            "email": "olivier.lechevalier@gmail.com",
+            "homepage": "https://github.com/RageZBla/"
+        }
+    ],
+    "require": {
+        "php": ">=5.3.0",
+        "ext-curl" : "*"
+    },
+    "autoload": {
+        "psr-0": {
+            "Silverpop": "lib"
+        }
+    }
+}
