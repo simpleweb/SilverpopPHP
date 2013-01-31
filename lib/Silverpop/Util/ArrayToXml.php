@@ -12,13 +12,13 @@ class ArrayToXML {
 	var $_ignore, $_err, $_errline, $_replace, $_attribs, $_parent;
 	var $_level = 0;
 	
-	function ArrayToXML( &$data, $replace = Array(), $attribs = Array() ) {
+	function __construct( &$data, $replace = Array(), $attribs = Array() ) {
 		$this->_attribs = $attribs;
 		$this->_replace = $replace;
 		$this->_data = $this->_processArray( $data );
 	}
 	
-	function & getXML() {
+	function getXML() {
 		return $this->_data;
 	}
 	
