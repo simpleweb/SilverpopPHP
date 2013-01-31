@@ -106,6 +106,110 @@ class EngagePod4 {
     }
 
     /**
+     * Double opt in a contact
+     *
+     * @param  string $databaseID 
+     * @param  string $email
+     * @throw  Exception in case of error
+     * @return int recipient ID
+     */
+    public function doubleOptInContact($databaseID, $email) {
+        $data["Envelope"] = array(
+            "Body" => array(
+                "DoubleOptInRecipient" => array(
+                    "LIST_ID"         => $databaseID,
+                    "COLUMN"          => array(
+                        array(
+                            'NAME'  => 'EMAIL',
+                            'VALUE' => $email,
+                        ),
+                    ),
+                ),
+            ),
+        );
+
+        $response = $this->_request($data);
+        $result = $response["Envelope"]["Body"]["RESULT"];
+        if ($this->_isSuccess($result)) {
+            if (isset($result['RecipientId']))
+                return $result['RecipientId'];
+            else {
+                throw new Exception('Recipient added but no recipient ID was returned from the server.');
+            }
+        }
+        
+        throw new Exception("DoubleOptInRecipient Error: ".$this->_getErrorFromResponse($response));
+    }
+
+    /**
+     * Update a contact. 
+     *
+     * @param int    $databaseID
+     * @param string $oldEmail 
+     * @param array  $columns
+     * @return int recipient ID
+     */
+    public function updateContact($databaseID, $oldEmail, $columns) {
+        $data["Envelope"] = array(
+            "Body" => array(
+                "UpdateRecipient" => array(
+                    "LIST_ID"         => $databaseID,
+                    "OLD_EMAIL"       => $oldEmail,
+                    "CREATED_FROM"    => 1,        // 1 = created manually
+                    "COLUMN" => array(),
+                ),
+            ),
+        );
+        foreach ($columns as $name => $value) {
+            $data["Envelope"]["Body"]["UpdateRecipient"]["COLUMN"][] = array("NAME" => $name, "VALUE" => $value);
+        }
+        $response = $this->_request($data);
+        $result = $response["Envelope"]["Body"]["RESULT"];
+        if ($this->_isSuccess($result)) {
+            if (isset($result['RecipientId']))
+                return $result['RecipientId'];
+            else {
+                throw new Exception('Recipient added but no recipient ID was returned from the server.');
+            }
+        }
+        
+        throw new Exception("UpdateRecipient Error: ".$this->_getErrorFromResponse($response));
+    }
+
+    /**
+     * Opt out a contact
+     *
+     * @param int    $databaseID
+     * @param string $email
+     * @param array  $columns
+     * @return boolean true on success
+     */ 
+    public function optOutContact($databaseID, $email, $columns = array()) {
+        $data["Envelope"] = array(
+            "Body" => array(
+                "OptOutRecipient" => array(
+                    "LIST_ID"         => $databaseID,
+                    "EMAIL"           => $email,
+                    "COLUMN" => array(),
+                ),
+            ),
+        );
+        $columns['EMAIL'] = $email;
+        foreach ($columns as $name => $value) {
+            $data["Envelope"]["Body"]["OptOutRecipient"]["COLUMN"][] = array("NAME" => $name, "VALUE" => $value);
+        }
+        
+        $response = $this->_request($data);
+        $result = $response["Envelope"]["Body"]["RESULT"];
+
+        if ($this->_isSuccess($result)) {
+            return true;
+        } 
+        
+        throw new Exception("OptOutRecipient Error: ".$this->_getErrorFromResponse($response));
+    }
+
+    /**
      * Create a new query
      *
      * Takes a list of criteria and creates a query from them
@@ -381,7 +485,7 @@ class EngagePod4 {
     }
 
     private function _isSuccess($result) {
-        if (isset($result['SUCCESS']) && (strtolower($result["SUCCESS"]) === "true")) {
+        if (isset($result['SUCCESS']) && in_array(strtolower($result["SUCCESS"]), array('true', 'success'))) {
             return true;
         }
         return false;
