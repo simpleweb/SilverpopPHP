@@ -114,21 +114,17 @@ class EngagePod4 {
      * @param bool $isPrivate
      * @return int ListID of the query that was created
      */
-    public function createQuery($queryName, $parentListId, $columnName, $operators, $values, $isPrivate = true) {
+    public function createQuery($queryName, $parentListId, $parentFolderId, $condition, $isPrivate = true) {
         $data['Envelope'] = array(
             'Body' => array(
                 'CreateQuery' => array(
                     'QUERY_NAME' => $queryName,
                     'PARENT_LIST_ID' => $parentListId,
+                    'PARENT_FOLDER_ID' => $parentFolderId,
                     'VISIBILITY' => ($isPrivate ? '0' : '1'),
                     'CRITERIA' => array(
                       'TYPE' => 'editable',
-                      'EXPRESSION' => array(
-                          'TYPE' => 'TE',
-                          'COLUMN_NAME' => $columnName,
-                          'OPERATORS' => $operators,
-                          'VALUES' => $values,
-                      ),
+                      'EXPRESSION' => $condition,
                     ),
                 ),
             ),
