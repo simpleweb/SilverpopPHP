@@ -1,6 +1,8 @@
 <?php
 
-require_once 'EngagePod4/xmlLib.php';
+namespace Silverpop;
+
+use Silverpop\EngagePod4\ArrayToXML;
 
 class EngagePod4 {
 
@@ -67,7 +69,7 @@ class EngagePod4 {
                 return array(); //?
             }
         } else {
-            throw new Exception("GetLists Error: ".$this->_getErrorFromResponse($response));
+            throw new \Exception("GetLists Error: ".$this->_getErrorFromResponse($response));
         }
     }
 
@@ -224,7 +226,8 @@ class EngagePod4 {
             "Body" => array(
                 "AddRecipient" => array(
                     "LIST_ID" => $databaseID,
-                    "CREATED_FROM" => 1,        // 1 = created manually, 2 = opted in
+                    "CREATED_FROM" => 1,         // 1 = created manually, 2 = opted in
+                    // "SEND_AUTOREPLY"  => 'true',
                     "UPDATE_IF_FOUND" => ($updateIfFound ? 'true' : 'false'),
                     "COLUMN" => array(),
                 ),
@@ -239,10 +242,34 @@ class EngagePod4 {
             if (isset($result['RecipientId']))
                 return $result['RecipientId'];
             else {
-                throw new Exception('Recipient added but no recipient ID was returned from the server.');
+                throw new \Exception('Recipient added but no recipient ID was returned from the server.');
             }
         } else {
-            throw new Exception("AddRecipient Error: ".$this->_getErrorFromResponse($response));
+            throw new \Exception("AddRecipient Error: ".$this->_getErrorFromResponse($response));
+        }
+    }
+
+    public function getContact($databaseID, $email)
+    {
+        $data["Envelope"] = array(
+            "Body" => array(
+                "SelectRecipientData" => array(
+                    "LIST_ID" => $databaseID,
+                    "EMAIL"   => $email
+                ),
+            ),
+        );
+
+        $response = $this->_request($data);
+        $result = $response["Envelope"]["Body"]["RESULT"];
+        if ($this->_isSuccess($result)) {
+            if (isset($result['RecipientId']))
+                return $result;
+            else {
+                throw new \Exception('Recipient added but no recipient ID was returned from the server.');
+            }
+        } else {
+            throw new \Exception("AddRecipient Error: ".$this->_getErrorFromResponse($response));
         }
     }
 
@@ -282,10 +309,10 @@ class EngagePod4 {
             if (isset($result['ListId']))
                 return $result['ListId'];
             else {
-                throw new Exception('Query created but no query ID was returned from the server.');
+                throw new \Exception('Query created but no query ID was returned from the server.');
             }
         } else {
-            throw new Exception("createQuery Error: ".$this->_getErrorFromResponse($response));
+            throw new \Exception("createQuery Error: ".$this->_getErrorFromResponse($response));
         }
     }
 
@@ -343,11 +370,58 @@ class EngagePod4 {
             if (isset($result['MAILING_ID']))
                 return $result['MAILING_ID'];
             else
-                throw new Exception('Email scheduled but no mailing ID was returned from the server.');
+                throw new \Exception('Email scheduled but no mailing ID was returned from the server.');
         } else {
-            throw new Exception("SendEmail Error: ".$this->_getErrorFromResponse($response));
+            throw new \Exception("SendEmail Error: ".$this->_getErrorFromResponse($response));
         }
     }
+
+    /**
+     * Send a single transactional email
+     *
+     * Sends an email to the specified email address ($emailID) using the mailingId
+     * of the autoresponder $mailingID. You can optionally include database keys
+     * to match if multikey database is used (not for replacement).
+     *
+     * ## Example
+     *
+     *     $engage->sendMailing("someone@somedomain.com", 149482, array("COLUMNS" => array(
+     *         'COLUMN' => array(
+     *             array(
+     *                 'Name' => 'FIELD_IN_TEMPLATE',
+     *                 'Value' => "value to MATCH",
+     *             ),
+     *         )
+     *     )));
+     *
+     * @param string $emailID ID of users email, must be opted in.
+     * @param int $mailingID ID of template upon which to base the mailing.
+     * @param array $optionalKeys additional keys to match reciepent 
+     * @return int $mailingID
+     */
+    public function sendMailing($emailID, $mailingID, $optionalKeys = array()) {
+        $data["Envelope"] = array(
+            "Body" => array(
+                "SendMailing" => array(
+                    "MailingId"         => $mailingID,
+                    "RecipientEmail"    => $emailID, 
+                ),
+            ),
+        );
+        foreach ($optionalKeys as $key => $value) {
+            $data["Envelope"]["Body"]["SendMailing"][$key] = $value;
+        }
+
+        $response = $this->_request($data);
+        $result = $response["Envelope"]["Body"]["RESULT"];
+
+        if ($this->_isSuccess($result)) {
+            return true;
+        } else {
+            throw new \Exception("SendEmail Error: ".$this->_getErrorFromResponse($response));
+        }
+    }
+        
 
     /**
      * Import a table
@@ -375,10 +449,10 @@ class EngagePod4 {
             if (isset($result['JOB_ID']))
                 return $result['JOB_ID'];
             else {
-                throw new Exception('Import table query created but no job ID was returned from the server.');
+                throw new \Exception('Import table query created but no job ID was returned from the server.');
             }
         } else {
-            throw new Exception("importTable Error: ".$this->_getErrorFromResponse($response));
+            throw new \Exception("importTable Error: ".$this->_getErrorFromResponse($response));
         }
 
     }
@@ -409,10 +483,10 @@ class EngagePod4 {
             if (isset($result['JOB_ID']))
                 return $result['JOB_ID'];
             else {
-                throw new Exception('Purge table query created but no job ID was returned from the server.');
+                throw new \Exception('Purge table query created but no job ID was returned from the server.');
             }
         } else {
-            throw new Exception("purgeTable Error: ".$this->_getErrorFromResponse($response));
+            throw new \Exception("purgeTable Error: ".$this->_getErrorFromResponse($response));
         }
 
     }
@@ -469,7 +543,7 @@ class EngagePod4 {
             $this->_username = $username;
             $this->_password = $password;
         } else {
-            throw new Exception("Login Error: ".$this->_getErrorFromResponse($response));
+            throw new \Exception("Login Error: ".$this->_getErrorFromResponse($response));
         }
     }
 
@@ -487,22 +561,32 @@ class EngagePod4 {
      */
     private function _request($data, $replace = array(), $attribs = array()) {
 
-        $atx = new ArrayToXML($data, $replace, $attribs);
+        if (is_array($data))
+        {
+            $atx = new ArrayToXML($data, $replace, $attribs);;
+            $xml = $atx->getXML();
+        }
+        else
+        {
+            //assume raw xml otherwise, we need this because we have to build
+            //  our own sometimes because assoc arrays don't support same name keys
+            $xml = $data;
+        }
 
         $fields = array(
             "jsessionid" => isset($this->_jsessionid) ? $this->_jsessionid : '',
-            "xml" => $atx->getXML(),
+            "xml" => $xml,
         );
         $response = $this->_httpPost($fields);
         if ($response) {
-            $arr = xml2array($response);
+            $arr = ArrayToXML::xml2array($response);
             if (isset($arr["Envelope"]["Body"]["RESULT"]["SUCCESS"])) {
                 return $arr;
             } else {
-                throw new Exception("HTTP Error: Invalid data from the server");
+                throw new \Exception("HTTP Error: Invalid data from the server");
             }
         } else {
-            throw new Exception("HTTP request failed");
+            throw new \Exception("HTTP request failed");
         }
     }
 
