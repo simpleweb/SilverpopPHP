@@ -174,7 +174,7 @@ class EngagePod4 {
      * @param bool $saveToSharedFolder
      * @return int $mailingID
      */
-    public function sendEmail($templateID, $targetID, $mailingName, $scheduledTimestamp, $optionalElements = array(), $saveToSharedFolder = 0) {
+    public function sendEmail($templateID, $targetID, $mailingName, $scheduledTimestamp, $optionalElements = array(), $saveToSharedFolder = 0, $suppressionLists = array()) {
         $data["Envelope"] = array(
             "Body" => array(
                 "ScheduleMailing" => array(
@@ -190,6 +190,10 @@ class EngagePod4 {
         );
         foreach ($optionalElements as $key => $value) {
             $data["Envelope"]["Body"]["ScheduleMailing"][$key] = $value;
+        }
+
+        if (is_array($suppressionLists) && count($suppressionLists) > 0) {
+            $data["Envelope"]["Body"]["ScheduleMailing"]['SUPPRESSION_LISTS']['SUPPRESSION_LIST_ID'] = $suppressionLists;
         }
 
         $response = $this->_request($data);
