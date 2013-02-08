@@ -297,7 +297,7 @@ class EngagePod4 {
 
         if ($this->_isSuccess($result)) {
             if (isset($result['JOB_STATUS']))
-                return $result['JOB_STATUS'];
+                return $result;
             else {
                 throw new Exception('Job status query was successful but no status was found.');
             }
