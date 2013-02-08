@@ -8,7 +8,7 @@ PHP client library for the Silverpop API
 <?php
 
 // Include the library
-require_once 'lib/EngagePod.php';
+require_once 'lib/EngagePod4.php';
 
 // Set some useful variables
 $databaseID   = 'XXX';
