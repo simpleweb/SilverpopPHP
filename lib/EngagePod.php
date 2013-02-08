@@ -79,7 +79,7 @@ class EngagePod4 {
             "Body" => array(
                 "AddRecipient" => array(
                     "LIST_ID" => $databaseID,
-                    "CREATED_FROM" => 1,        // 1 = created manually
+                    "CREATED_FROM" => 1,        // 1 = created manually, 2 = opted in
                     "UPDATE_IF_FOUND" => ($updateIfFound ? 'true' : 'false'),
                     "COLUMN" => array(),
                 ),
@@ -295,7 +295,7 @@ class EngagePod4 {
             if (isset($result['JOB_STATUS']))
                 return $result['JOB_STATUS'];
             else {
-                throw new Exception('Job status query was successful but no status was found;');
+                throw new Exception('Job status query was successful but no status was found.');
             }
         } else {
             throw new Exception("getJobStatus Error: ".$this->_getErrorFromResponse($response));
@@ -340,8 +340,10 @@ class EngagePod4 {
      * Private method: make the request
      *
      */
-    private function _request($data) {
-        $atx = new ArrayToXML( $data, array(), array() );
+    private function _request($data, $replace = array(), $attribs = array()) {
+
+        $atx = new ArrayToXML($data, $replace, $attribs);
+
         $fields = array(
             "jsessionid" => isset($this->_jsessionid) ? $this->_jsessionid : '',
             "xml" => $atx->getXML(),
