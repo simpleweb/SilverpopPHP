@@ -72,7 +72,152 @@ class EngagePod4 {
     }
 
     /**
+     * Get mailing templates
+     * 
+     */
+    public function getMailingTemplates($isPrivate = true) {
+        $data["Envelope"] = array(
+            "Body" => array(
+                "GetMailingTemplates" => array(
+                    "VISIBILITY" => ($isPrivate ? '0' : '1'),
+                ),
+            ),
+        );
+        $response = $this->_request($data);
+        $result = $response["Envelope"]["Body"]["RESULT"];
+        if ($this->_isSuccess($result)) {
+            if (isset($result['MAILING_TEMPLATE']))
+                return $result['MAILING_TEMPLATE'];
+            else {
+                return array(); //?
+            }
+        } else {
+            throw new Exception("GetLists Error: ".$this->_getErrorFromResponse($response));
+        }
+    }
+
+    /**
+     * Double opt in a contact
+     * 
+     */
+    public function doubleOptInContact($databaseID, $columns) {
+        $data["Envelope"] = array(
+            "Body" => array(
+                "DoubleOptInRecipient" => array(
+                    "LIST_ID" => $databaseID,
+                    "COLUMN" => array(),
+                ),
+            ),
+        );
+        foreach ($columns as $name => $value) {
+            $data["Envelope"]["Body"]["DoubleOptInRecipient"]["COLUMN"][] = array("NAME" => $name, "VALUE" => $value);
+        }
+        $response = $this->_request($data);
+        $result = $response["Envelope"]["Body"]["RESULT"];
+        if ($this->_isSuccess($result)) {
+            if (isset($result['RecipientId']))
+                return $result['RecipientId'];
+            else {
+                throw new Exception('Recipient added but no recipient ID was returned from the server.');
+            }
+        } else {
+            return false;
+        }
+    }
+
+    /**
+     * Calculate a query
+     * 
+     */
+    public function calculateQuery($databaseID) {
+        $data["Envelope"] = array(
+            "Body" => array(
+                "CalculateQuery" => array(
+                    "QUERY_ID" => $databaseID,
+                ),
+            ),
+        );
+        $response = $this->_request($data);
+        $result = $response["Envelope"]["Body"]["RESULT"];
+        if ($this->_isSuccess($result)) {
+            return $result["JOB_ID"];
+        } else {
+            throw new Exception("Silverpop says: ".$response["Envelope"]["Body"]["Fault"]["FaultString"]);
+        }
+    }
+
+    /**
+     * Get scheduled mailings
+     * 
+     */
+    public function getScheduledMailings() {
+        $data['Envelope'] = array(
+            'Body' => array(
+                'GetSentMailingsForOrg' => array(
+                    'SCHEDULED' => null,
+                ),
+            ),
+        );
+        $response = $this->_request($data);
+        $result = $response["Envelope"]["Body"]["RESULT"];
+        if ($this->_isSuccess($result)) {
+            return $result;
+        } else {
+            throw new Exception("Silverpop says: ".$response["Envelope"]["Body"]["Fault"]["FaultString"]);
+        }
+    }
+
+    /**
+     * Get the meta information for a list
+     * 
+     */
+    public function getListMetaData($databaseID) {
+        $data["Envelope"] = array(
+            "Body" => array(
+                "GetListMetaData" => array(
+                    "LIST_ID" => $databaseID,
+                ),
+            ),
+        );
+        $response = $this->_request($data);
+        $result = $response["Envelope"]["Body"]["RESULT"];
+        if ($this->_isSuccess($result)) {
+            return $result;
+        } else {
+            throw new Exception("Silverpop says: ".$response["Envelope"]["Body"]["Fault"]["FaultString"]);
+        }
+    }
+    
+    /**
+     * Remove a contact
+     * 
+     */
+    public function removeContact($databaseID, $email, $customer_id) {
+        $data["Envelope"] = array(
+            "Body" => array(
+                "RemoveRecipient" => array(
+                    "LIST_ID" => $databaseID,
+                    "EMAIL" => $email,
+                    "COLUMN" => array(array("NAME"=>"customer_id", "VALUE"=>$customer_id)),
+                ),
+            ),
+        );
+        $response = $this->_request($data);
+        $result = $response["Envelope"]["Body"]["RESULT"];
+        if ($this->_isSuccess($result)) {
+            return true;
+        } else {
+            if ($response["Envelope"]["Body"]["Fault"]["FaultString"]=="Error removing recipient from list. Recipient is not a member of this list."){
+                return true;
+            } else {
+                throw new Exception("Silverpop says: ".$response["Envelope"]["Body"]["Fault"]["FaultString"]);
+            }
+        }
+    }
+    
+    /**
      * Add a contact to a list
+     * 
      */
     public function addContact($databaseID, $updateIfFound, $columns) {
         $data["Envelope"] = array(
