@@ -6,7 +6,7 @@ use Silverpop\Util\ArrayToXML;
 
 require_once __DIR__ . '/Util/ArrayToXml.php';
 
-class EngagePod4 {
+class EngagePod {
 
     /**
      * Current version of the library
