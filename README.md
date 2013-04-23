@@ -2,13 +2,29 @@
 
 PHP client library for the Silverpop API
 
+## Installation
+
+Installation via [composer](http://getcomposer.org)
+
+```javascript
+{
+    "require": {
+        "simpleweb/silverpopphp": "master-dev"
+    },
+    "repositories": [{
+        "type": "vcs",
+        "url": "https://github.com/romulodl/SilverpopPHP"
+    }]
+}
+```
+
 ## Usage
 
 ```php
 <?php
 
 // Include the library
-require_once 'lib/EngagePod.php';
+require_once 'vendor/autoload.php';
 
 // Set some useful variables
 $databaseID   = 'XXX';
