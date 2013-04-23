@@ -18,7 +18,7 @@
     },
     "autoload": {
         "psr-0": {
-            "": "src/"
+            "Silverpop": "src/"
         }
     },
     "minimum-stability" : "dev"
