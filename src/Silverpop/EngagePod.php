@@ -101,35 +101,6 @@ class EngagePod {
     }
 
     /**
-     * Double opt in a contact
-     * 
-     */
-    public function doubleOptInContact($databaseID, $columns) {
-        $data["Envelope"] = array(
-            "Body" => array(
-                "DoubleOptInRecipient" => array(
-                    "LIST_ID" => $databaseID,
-                    "COLUMN" => array(),
-                ),
-            ),
-        );
-        foreach ($columns as $name => $value) {
-            $data["Envelope"]["Body"]["DoubleOptInRecipient"]["COLUMN"][] = array("NAME" => $name, "VALUE" => $value);
-        }
-        $response = $this->_request($data);
-        $result = $response["Envelope"]["Body"]["RESULT"];
-        if ($this->_isSuccess($result)) {
-            if (isset($result['RecipientId']))
-                return $result['RecipientId'];
-            else {
-                throw new Exception('Recipient added but no recipient ID was returned from the server.');
-            }
-        } else {
-            return false;
-        }
-    }
-
-    /**
      * Calculate a query
      * 
      */
