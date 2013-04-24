@@ -4,7 +4,7 @@ PHP client library for the Silverpop API
 
 ## Installation
 
-Installation via [composer](http://getcomposer.org)
+Installation via [composer](http://getcomposer.org) . Create a composer.json file in the root folder of you project and paste the code below.
 
 ```javascript
 {
@@ -18,6 +18,9 @@ Installation via [composer](http://getcomposer.org)
 }
 ```
 
+With composer installed, just run `php composer.phar install` or simply
+`composer install` if you [did a global install](http://getcomposer.org/doc/00-intro.md#globally).
+
 ## Usage
 
 ```php
@@ -25,6 +28,9 @@ Installation via [composer](http://getcomposer.org)
 
 // Include the library
 require_once 'vendor/autoload.php';
+
+// Require the Silverpop Namespace
+use Silverpop\EngagePod;
 
 // Set some useful variables
 $databaseID   = 'XXX';

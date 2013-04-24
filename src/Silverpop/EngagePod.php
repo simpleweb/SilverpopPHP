@@ -4,8 +4,6 @@ namespace Silverpop;
 
 use Silverpop\Util\ArrayToXML;
 
-require_once __DIR__ . '/Util/ArrayToXml.php';
-
 class EngagePod {
 
     /**
@@ -77,7 +75,7 @@ class EngagePod {
 
     /**
      * Get mailing templates
-     * 
+     *
      */
     public function getMailingTemplates($isPrivate = true) {
         $data["Envelope"] = array(
