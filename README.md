@@ -10,11 +10,7 @@ Installation via [composer](http://getcomposer.org) . Create a composer.json fil
 {
     "require": {
         "simpleweb/silverpopphp": "master-dev"
-    },
-    "repositories": [{
-        "type": "vcs",
-        "url": "https://github.com/romulodl/SilverpopPHP"
-    }]
+    }
 }
 ```
 
