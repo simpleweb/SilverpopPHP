@@ -1,5 +1,5 @@
 {
-    "name": "dhs/silverpop",
+    "name": "simpleweb/silverpopphp",
     "type": "library",
     "description": "Silverpop API in php",
     "keywords": ["Silverpop","email", "API", "XML-API"],
@@ -18,7 +18,8 @@
     },
     "autoload": {
         "psr-0": {
-            "Silverpop": "lib"
+            "Silverpop": "src/"
         }
-    }
+    },
+    "minimum-stability" : "dev"
 }
