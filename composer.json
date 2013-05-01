@@ -3,7 +3,7 @@
     "type": "library",
     "description": "Silverpop API in php",
     "keywords": ["Silverpop","email", "API", "XML-API"],
-    "homepage": "https://github.com/DHS/SilverpopPHP",
+    "homepage": "https://github.com/simpleweb/SilverpopPHP",
     "license": "GPL",
     "authors": [
         {
