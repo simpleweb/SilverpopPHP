@@ -1,9 +1,9 @@
 {
-    "name": "simpleweb/silverpopphp",
+    "name": "ckdarby/silverpopphp",
     "type": "library",
     "description": "Silverpop API in php",
     "keywords": ["Silverpop","email", "API", "XML-API"],
-    "homepage": "https://github.com/simpleweb/SilverpopPHP",
+    "homepage": "https://github.com/ckdarby/SilverpopPHP",
     "license": "GPL",
     "authors": [
         {
