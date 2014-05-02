@@ -23,7 +23,7 @@ class EngagePod {
 
     /**
      * Constructor
-     * 
+     *
      * Sets $this->_baseUrl based on the engage server specified in config
      */
     public function __construct($config) {
@@ -37,7 +37,7 @@ class EngagePod {
 
     /**
      * Fetches the contents of a list
-     * 
+     *
      * $listType can be one of:
      *
      * 0 - Databases
@@ -94,13 +94,13 @@ class EngagePod {
                 return array(); //?
             }
         } else {
-            throw new Exception("GetLists Error: ".$this->_getErrorFromResponse($response));
+            throw new \Exception("GetLists Error: ".$this->_getErrorFromResponse($response));
         }
     }
 
     /**
      * Calculate a query
-     * 
+     *
      */
     public function calculateQuery($databaseID) {
         $data["Envelope"] = array(
@@ -115,13 +115,13 @@ class EngagePod {
         if ($this->_isSuccess($result)) {
             return $result["JOB_ID"];
         } else {
-            throw new Exception("Silverpop says: ".$response["Envelope"]["Body"]["Fault"]["FaultString"]);
+            throw new \Exception("Silverpop says: ".$response["Envelope"]["Body"]["Fault"]["FaultString"]);
         }
     }
 
     /**
      * Get scheduled mailings
-     * 
+     *
      */
     public function getScheduledMailings() {
         $data['Envelope'] = array(
@@ -142,7 +142,7 @@ class EngagePod {
 
     /**
      * Get the meta information for a list
-     * 
+     *
      */
     public function getListMetaData($databaseID) {
         $data["Envelope"] = array(
@@ -157,13 +157,13 @@ class EngagePod {
         if ($this->_isSuccess($result)) {
             return $result;
         } else {
-            throw new Exception("Silverpop says: ".$response["Envelope"]["Body"]["Fault"]["FaultString"]);
+            throw new \Exception("Silverpop says: ".$response["Envelope"]["Body"]["Fault"]["FaultString"]);
         }
     }
-    
+
     /**
      * Remove a contact
-     * 
+     *
      */
     public function removeContact($databaseID, $email, $customer_id) {
         $data["Envelope"] = array(
@@ -183,22 +183,22 @@ class EngagePod {
             if ($response["Envelope"]["Body"]["Fault"]["FaultString"]=="Error removing recipient from list. Recipient is not a member of this list."){
                 return true;
             } else {
-                throw new Exception("Silverpop says: ".$response["Envelope"]["Body"]["Fault"]["FaultString"]);
+                throw new \Exception("Silverpop says: ".$response["Envelope"]["Body"]["Fault"]["FaultString"]);
             }
         }
     }
-    
+
     /**
      * Add a contact to a list
-     * 
+     *
      */
-    public function addContact($databaseID, $updateIfFound, $columns, $contactListID = '') {
+    public function addContact($databaseID, $updateIfFound, $columns, $contactListID = '', $sendAutoReply = false) {
         $data["Envelope"] = array(
             "Body" => array(
                 "AddRecipient" => array(
                     "LIST_ID" => $databaseID,
                     "CREATED_FROM" => 1,         // 1 = created manually, 2 = opted in
-                    // "SEND_AUTOREPLY"  => 'true',
+                    "SEND_AUTOREPLY"  => ($sendAutoReply ? 'true' : 'false'),
                     "UPDATE_IF_FOUND" => ($updateIfFound ? 'true' : 'false'),
                     "CONTACT_LISTS" => array("CONTACT_LIST_ID" => $contactListID),
                     "COLUMN" => array(),
@@ -248,8 +248,10 @@ class EngagePod {
     /**
      * Double opt in a contact
      *
-     * @param  string $databaseID 
+     * @param  string $databaseID
      * @param  string $email
+     *
+     * @throws \Exception
      * @throw  Exception in case of error
      * @return int recipient ID
      */
@@ -277,16 +279,18 @@ class EngagePod {
                 throw new \Exception('Recipient added but no recipient ID was returned from the server.');
             }
         }
-        
+
         throw new \Exception("DoubleOptInRecipient Error: ".$this->_getErrorFromResponse($response));
     }
 
     /**
-     * Update a contact. 
+     * Update a contact.
      *
      * @param int    $databaseID
-     * @param string $oldEmail 
+     * @param string $oldEmail
      * @param array  $columns
+     *
+     * @throws \Exception
      * @return int recipient ID
      */
     public function updateContact($databaseID, $oldEmail, $columns) {
@@ -312,7 +316,7 @@ class EngagePod {
                 throw new \Exception('Recipient added but no recipient ID was returned from the server.');
             }
         }
-        
+
         throw new \Exception("UpdateRecipient Error: ".$this->_getErrorFromResponse($response));
     }
 
@@ -322,8 +326,10 @@ class EngagePod {
      * @param int    $databaseID
      * @param string $email
      * @param array  $columns
+     *
+     * @throws \Exception
      * @return boolean true on success
-     */ 
+     */
     public function optOutContact($databaseID, $email, $columns = array()) {
         $data["Envelope"] = array(
             "Body" => array(
@@ -338,14 +344,14 @@ class EngagePod {
         foreach ($columns as $name => $value) {
             $data["Envelope"]["Body"]["OptOutRecipient"]["COLUMN"][] = array("NAME" => $name, "VALUE" => $value);
         }
-        
+
         $response = $this->_request($data);
         $result = $response["Envelope"]["Body"]["RESULT"];
 
         if ($this->_isSuccess($result)) {
             return true;
-        } 
-        
+        }
+
         throw new \Exception("OptOutRecipient Error: ".$this->_getErrorFromResponse($response));
     }
 
@@ -355,11 +361,15 @@ class EngagePod {
      * Takes a list of criteria and creates a query from them
      *
      * @param string $queryName The name of the new query
-     * @param int $parentListId List that this query is derived from
-     * @param string $columnName Column that the expression will run against
-     * @param string $operators Operator that will be used for the expression
-     * @param string $values
-     * @param bool $isPrivate
+     * @param int    $parentListId List that this query is derived from
+     * @param        $parentFolderId
+     * @param        $condition
+     * @param bool   $isPrivate
+     *
+     * @throws \Exception
+     * @internal param string $columnName Column that the expression will run against
+     * @internal param string $operators Operator that will be used for the expression
+     * @internal param string $values
      * @return int ListID of the query that was created
      */
     public function createQuery($queryName, $parentListId, $parentFolderId, $condition, $isPrivate = true) {
@@ -371,8 +381,8 @@ class EngagePod {
                     'PARENT_FOLDER_ID' => $parentFolderId,
                     'VISIBILITY' => ($isPrivate ? '0' : '1'),
                     'CRITERIA' => array(
-                      'TYPE' => 'editable',
-                      'EXPRESSION' => $condition,
+                        'TYPE' => 'editable',
+                        'EXPRESSION' => $condition,
                     ),
                 ),
             ),
@@ -410,12 +420,15 @@ class EngagePod {
      *         )
      *     ));
      *
-     * @param int $templateID ID of template upon which to base the mailing.
-     * @param int $targetID ID of database, query, or contact list to send the template-based mailing.
-     * @param string $mailingName Name to assign to the generated mailing.
-     * @param int $scheduledTimestamp When the mailing should be scheduled to send. This must be later than the current timestamp.
-     * @param array $optionalElements An array of $key => $value, where $key can be one of SUBJECT, FROM_NAME, FROM_ADDRESS, REPLY_TO, SUBSTITUTIONS
-     * @param bool $saveToSharedFolder
+     * @param int      $templateID ID of template upon which to base the mailing.
+     * @param int      $targetID ID of database, query, or contact list to send the template-based mailing.
+     * @param string   $mailingName Name to assign to the generated mailing.
+     * @param int      $scheduledTimestamp When the mailing should be scheduled to send. This must be later than the current timestamp.
+     * @param array    $optionalElements An array of $key => $value, where $key can be one of SUBJECT, FROM_NAME, FROM_ADDRESS, REPLY_TO, SUBSTITUTIONS
+     * @param bool|int $saveToSharedFolder
+     * @param array    $suppressionLists
+     *
+     * @throws \Exception
      * @return int $mailingID
      */
     public function sendEmail($templateID, $targetID, $mailingName, $scheduledTimestamp, $optionalElements = array(), $saveToSharedFolder = 0, $suppressionLists = array()) {
@@ -471,8 +484,10 @@ class EngagePod {
      *     )));
      *
      * @param string $emailID ID of users email, must be opted in.
-     * @param int $mailingID ID of template upon which to base the mailing.
-     * @param array $optionalKeys additional keys to match reciepent 
+     * @param int    $mailingID ID of template upon which to base the mailing.
+     * @param array  $optionalKeys additional keys to match reciepent
+     *
+     * @throws \Exception
      * @return int $mailingID
      */
     public function sendMailing($emailID, $mailingID, $optionalKeys = array()) {
@@ -480,7 +495,7 @@ class EngagePod {
             "Body" => array(
                 "SendMailing" => array(
                     "MailingId"         => $mailingID,
-                    "RecipientEmail"    => $emailID, 
+                    "RecipientEmail"    => $emailID,
                 ),
             ),
         );
@@ -497,7 +512,7 @@ class EngagePod {
             throw new \Exception("SendEmail Error: ".$this->_getErrorFromResponse($response));
         }
     }
-        
+
 
     /**
      * Import a table
