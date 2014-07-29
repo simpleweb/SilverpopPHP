@@ -583,6 +583,40 @@ class EngagePod {
     }
 
     /**
+     * Import a list/database
+     *
+     * Requires a file to import and a mapping file to be in the 'upload' directory of the Engage FTP server
+     *
+     * Returns the data job id
+     *
+     */
+    public function importList($fileName, $mapFileName) {
+
+        $data["Envelope"] = array(
+            "Body" => array(
+                "ImportList" => array(
+                    "MAP_FILE" => $mapFileName,
+                    "SOURCE_FILE" => $fileName,
+                ),
+            ),
+        );
+
+        $response = $this->_request($data);
+        $result = $response["Envelope"]["Body"]["RESULT"];
+
+        if ($this->_isSuccess($result)) {
+            if (isset($result['JOB_ID']))
+                return $result['JOB_ID'];
+            else {
+                throw new \Exception('Import list query created but no job ID was returned from the server.');
+            }
+        } else {
+            throw new \Exception("importList Error: ".$this->_getErrorFromResponse($response));
+        }
+
+    }
+
+    /**
      * Get a data job status
      *
      * Returns the status or throws an exception
