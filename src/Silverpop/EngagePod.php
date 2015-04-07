@@ -192,7 +192,7 @@ class EngagePod {
      * Add a contact to a list
      *
      */
-    public function addContact($databaseID, $updateIfFound, $columns, $contactListID = false, $sendAutoReply = false) {
+    public function addContact($databaseID, $updateIfFound, $columns, $contactListID = false, $sendAutoReply = false, $allowHTML = false) {
         $data["Envelope"] = array(
             "Body" => array(
                 "AddRecipient" => array(
@@ -200,6 +200,7 @@ class EngagePod {
                     "CREATED_FROM" => 1,         // 1 = created manually, 2 = opted in
                     "SEND_AUTOREPLY"  => ($sendAutoReply ? 'true' : 'false'),
                     "UPDATE_IF_FOUND" => ($updateIfFound ? 'true' : 'false'),
+                    "ALLOW_HTML" => ($allowHTML ? 'true' : 'false'),
                     "CONTACT_LISTS" => ($contactListID) ? array("CONTACT_LIST_ID" => $contactListID) : '',
                     "COLUMN" => array(),
                 ),
