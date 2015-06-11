@@ -726,6 +726,7 @@ class EngagePod {
         $ch = curl_init();
 
         //set the url, number of POST vars, POST data
+        curl_setopt($ch,CURLOPT_HTTPHEADER, array('Expect:'));
         curl_setopt($ch,CURLOPT_URL,$this->_getFullUrl());
         curl_setopt($ch,CURLOPT_POST,count($fields));
         curl_setopt($ch,CURLOPT_POSTFIELDS,$fields_string);
