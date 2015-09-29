@@ -51,7 +51,7 @@ class ArrayToXML {
 			
 			if ( isset( $this->_attribs[$tlevel][$name][$this->_rep[$name] - 1] ) && is_array( $this->_attribs[$tlevel][$name][$this->_rep[$name] - 1] ) ) {
 				foreach ( (array) $this->_attribs[$tlevel][$name][$this->_rep[$name] - 1] as $aname => $avalue ) {
-					unset( $value[$aname] );
+					//unset( $value[$aname] );
 					$attrs .= " $aname=\"$avalue\"";
 				}
 			}
