@@ -710,6 +710,8 @@ class EngagePod {
      *
      */
     private function _getErrorFromResponse($response) {
+	    if (isset($response['Envelope']['Body']['RESULT']['FAILURES'])) {
+		    return json_encode($response['Envelope']['Body']['RESULT']['FAILURES']);
         if (isset($response['Envelope']['Body']['Fault']['FaultString']) && !empty($response['Envelope']['Body']['Fault']['FaultString'])) {
             return $response['Envelope']['Body']['Fault']['FaultString'];
         }
@@ -721,6 +723,10 @@ class EngagePod {
      *
      */
     private function _isSuccess($result) {
+	    if (isset($result['FAILURES']) and (bool)count($result['FAILURES'])) {
+		    return false;
+	    }
+	    
         if (isset($result['SUCCESS']) && in_array(strtolower($result["SUCCESS"]), array('true', 'success'))) {
             return true;
         }
