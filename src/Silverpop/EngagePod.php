@@ -36,6 +36,22 @@ class EngagePod {
     }
 
     /**
+     * Terminate the session with Silverpop.
+     *
+     * @return bool
+     */
+    public function logOut() {
+      $data["Envelope"] = array(
+        "Body" => array(
+          "Logout" => ""
+        ),
+      );
+      $response = $this->_request($data);
+      $result = $response["Envelope"]["Body"]["RESULT"];
+      return $this->_isSuccess($result);
+    }
+
+    /**
      * Fetches the contents of a list
      *
      * $listType can be one of:
