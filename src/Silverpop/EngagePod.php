@@ -612,6 +612,84 @@ class EngagePod {
         }
 
     }
+    
+    /**
+	 * This interface inserts or updates relational data
+	 *
+	 * For each Row that is passed in:
+	 * - If a row is found having the same key as the passed in row, update the record.
+	 * - If no matching row is found, insert a new row setting the column values to those passed in the request.
+	 *
+	 * Only one hundred rows may be passed in a single insertUpdateRelationalTable call!
+	 */
+    public function insertUpdateRelationalTable($tableId, $rows) {
+	    $processedRows = array();
+        $attribs = array();
+	    foreach($rows as $row) {
+		    $columns = array();
+		    foreach($row as $name => $value)
+		    {
+			    $columns['COLUMN'][] = $value;
+			    $attribs[5]['COLUMN'][] = array('name' => $name);
+		    }
+		    
+		    $processedRows['ROW'][] = $columns;
+	    }
+	    
+	    $data["Envelope"] = array(
+            "Body" => array(
+                "InsertUpdateRelationalTable" => array(
+                    "TABLE_ID" => $tableId,
+                    "ROWS" => $processedRows,
+                ),
+            ),
+        );
+
+        $response = $this->_request($data, array(), $attribs);
+        $result = $response["Envelope"]["Body"]["RESULT"];
+
+        if ($this->_isSuccess($result)) {
+            return true;
+        } else {
+            throw new \Exception("insertUpdateRelationalTable Error: ".$this->_getErrorFromResponse($response));
+        }
+    }
+    
+    /**
+	 * This interface deletes records from a relational table.
+	 */
+    public function deleteRelationalTableData($tableId, $rows) {
+	    $processedRows = array();
+        $attribs = array();
+	    foreach($rows as $row) {
+		    $columns = array();
+		    foreach($row as $name => $value)
+		    {
+			    $columns['KEY_COLUMN'][] = $value;
+			    $attribs[5]['KEY_COLUMN'][] = array('name' => $name);
+		    }
+		    
+		    $processedRows['ROW'][] = $columns;
+	    }
+	    
+	    $data["Envelope"] = array(
+            "Body" => array(
+                "DeleteRelationalTableData" => array(
+                    "TABLE_ID" => $tableId,
+                    "ROWS" => $processedRows,
+                ),
+            ),
+        );
+        
+        $response = $this->_request($data, array(), $attribs);
+        $result = $response["Envelope"]["Body"]["RESULT"];
+
+        if ($this->_isSuccess($result)) {
+            return true;
+        } else {
+            throw new \Exception("deleteRelationalTableData Error: ".$this->_getErrorFromResponse($response));
+        }
+    }
 
     /**
      * Import a list/database
@@ -761,6 +839,8 @@ class EngagePod {
         curl_setopt($ch,CURLOPT_POST,count($fields));
         curl_setopt($ch,CURLOPT_POSTFIELDS,$fields_string);
         curl_setopt($ch,CURLOPT_RETURNTRANSFER,true);
+        curl_setopt($ch,CURLOPT_HTTPHEADER,array (
+   "Content-Type: application/x-www-form-urlencoded; charset=utf-8" ));
 
         //execute post
         $result = curl_exec($ch);
