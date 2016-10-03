@@ -240,6 +240,11 @@ class EngagePod {
 
     public function getContact($databaseID, $email = null, $recipientId = null, $encodedRecipientId = null , $returnContactLists = false, $columns = null)
     {
+
+      if ( empty( $email ) && empty( $recipientId ) ) {
+        throw new \Exception('One of Email address or Recipient ID must have a value.');
+      }
+
       $data["Envelope"] = array(
         "Body" => array(
           "SelectRecipientData" => array(
