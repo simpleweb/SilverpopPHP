@@ -2,7 +2,7 @@
 
 namespace Silverpop;
 
-use Silverpop\Util\ArrayToXML;
+use Silverpop\Util\ArrayToXml;
 
 class EngagePod {
 
@@ -598,7 +598,7 @@ class EngagePod {
         }
 
     }
-    
+
     /**
 	 * This interface inserts or updates relational data
 	 *
@@ -618,10 +618,10 @@ class EngagePod {
 			    $columns['COLUMN'][] = $value;
 			    $attribs[5]['COLUMN'][] = array('name' => $name);
 		    }
-		    
+
 		    $processedRows['ROW'][] = $columns;
 	    }
-	    
+
 	    $data["Envelope"] = array(
             "Body" => array(
                 "InsertUpdateRelationalTable" => array(
@@ -640,7 +640,7 @@ class EngagePod {
             throw new \Exception("insertUpdateRelationalTable Error: ".$this->_getErrorFromResponse($response));
         }
     }
-    
+
     /**
 	 * This interface deletes records from a relational table.
 	 */
@@ -654,10 +654,10 @@ class EngagePod {
 			    $columns['KEY_COLUMN'][] = $value;
 			    $attribs[5]['KEY_COLUMN'][] = array('name' => $name);
 		    }
-		    
+
 		    $processedRows['ROW'][] = $columns;
 	    }
-	    
+
 	    $data["Envelope"] = array(
             "Body" => array(
                 "DeleteRelationalTableData" => array(
@@ -666,7 +666,7 @@ class EngagePod {
                 ),
             ),
         );
-        
+
         $response = $this->_request($data, array(), $attribs);
         $result = $response["Envelope"]["Body"]["RESULT"];
 
@@ -783,7 +783,7 @@ class EngagePod {
 
         if (is_array($data))
         {
-            $atx = new ArrayToXML($data, $replace, $attribs);;
+            $atx = new ArrayToXml($data, $replace, $attribs);;
             $xml = $atx->getXML();
         }
         else
