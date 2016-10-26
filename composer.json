@@ -1,5 +1,5 @@
 {
-    "name": "simpleweb/silverpopphp",
+    "name": "lyndonbazza/silverpopphp",
     "type": "library",
     "description": "Silverpop API in php",
     "keywords": ["Silverpop","email", "API", "XML-API"],
