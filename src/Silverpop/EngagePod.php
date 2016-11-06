@@ -238,16 +238,35 @@ class EngagePod {
         }
     }
 
-    public function getContact($databaseID, $email)
+    public function getContact($databaseID, $email = null, $recipientId = null, $encodedRecipientId = null , $returnContactLists = false, $columns = null)
     {
-        $data["Envelope"] = array(
-            "Body" => array(
-                "SelectRecipientData" => array(
-                    "LIST_ID" => $databaseID,
-                    "EMAIL"   => $email
-                ),
-            ),
-        );
+
+      if ( empty( $email ) && empty( $recipientId ) ) {
+        throw new \Exception('One of Email address or Recipient ID must have a value.');
+      }
+
+      $data["Envelope"] = array(
+        "Body" => array(
+          "SelectRecipientData" => array(
+            "LIST_ID" => $databaseID,
+            "EMAIL"   => empty($recipientId) ? $email : null,
+            "RECIPIENT_ID" => !empty($recipientId) ? $recipientId : null,
+            "ENCODED_RECIPIENT_ID" => !empty($encodedRecipientId) ? $encodedRecipientId : null,
+            "RETURN_CONTACT_LISTS" => (bool) $returnContactLists,
+          ),
+        ),
+      );
+
+      if ( !empty($columns) && is_array($columns) ) {
+        $column_data = array();
+        foreach ($columns as $key => $value ) {
+          $column_data[] = array(
+            "NAME" => $key,
+            "VALUE" => $columns[$key],
+          );
+        }
+        $data["Envelope"]["Body"]["SelectRecipeientData"]["COLUMN"] = $column_data;
+      }
 
         $response = $this->_request($data);
         $result = $response["Envelope"]["Body"]["RESULT"];
