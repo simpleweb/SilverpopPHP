@@ -4,24 +4,24 @@ namespace Silverpop\Util;
 	Original source from: http://codes.myfreewares.com/php/XML/XML%20@=@%20Associative%20Array.php-file.html
 */
 
-class ArrayToXML {
+class ArrayToXml {
 	var $_data;
 	var $_name = Array();
 	var $_rep  = Array();
 	var $_parser = 0;
 	var $_ignore, $_err, $_errline, $_replace, $_attribs, $_parent;
 	var $_level = 0;
-	
+
 	function __construct( &$data, $replace = Array(), $attribs = Array() ) {
 		$this->_attribs = $attribs;
 		$this->_replace = $replace;
 		$this->_data = $this->_processArray( $data );
 	}
-	
+
 	function getXML() {
 		return $this->_data;
 	}
-	
+
 	function _processArray( &$array, $level = 0, $parent = '' ) {
 		//ksort($array);
 		$return = '';
@@ -29,7 +29,7 @@ class ArrayToXML {
 			$tlevel = $level;
 			$isarray = false;
 			$attrs = '';
-			
+
 			if ( is_array( $value ) && ( sizeof( $value ) > 0 ) && array_key_exists( 0, $value ) ) {
 				$tlevel = $level - 1;
 				$isarray = true;
@@ -45,10 +45,10 @@ class ArrayToXML {
 					$this->_rep[$name] = 0;
 				$this->_rep[$name]++;
 			}
-			
+
 			if ( ! isset( $this->_rep[$name] ) )
 				$this->_rep[$name] = 0;
-			
+
 			if ( isset( $this->_attribs[$tlevel][$name][$this->_rep[$name] - 1] ) && is_array( $this->_attribs[$tlevel][$name][$this->_rep[$name] - 1] ) ) {
 				foreach ( (array) $this->_attribs[$tlevel][$name][$this->_rep[$name] - 1] as $aname => $avalue ) {
 					$attrs .= " $aname=\"$avalue\"";
@@ -56,9 +56,9 @@ class ArrayToXML {
 			}
 			if ( isset($this->_replace[$name]) && $this->_replace[$name] )
 				$name = $this->_replace[$name];
-			
+
 			is_array( $value ) ? $output = $this->_processArray( $value, $tlevel + 1, $name ) : $output = htmlspecialchars( $value );
-			
+
 			$isarray ? $return .= $output : $return .= "<$name$attrs>$output</$name>\n";
 		}
 		return $return;
@@ -104,7 +104,7 @@ function xml2array($contents, $get_attributes=1, $priority = 'tag') {
 
         $result = array();
         $attributes_data = array();
-        
+
         if(isset($value)) {
             if($priority == 'tag') $result = $value;
             else $result['value'] = $value; //Put the value in a assoc array if we are in the 'Attribute' mode
@@ -136,7 +136,7 @@ function xml2array($contents, $get_attributes=1, $priority = 'tag') {
                 } else {//This section will make the value an array if multiple tags with the same name appear together
                     $current[$tag] = array($current[$tag],$result);//This will combine the existing item and the new item together to make an array
                     $repeated_tag_index[$tag.'_'.$level] = 2;
-                    
+
                     if(isset($current[$tag.'_attr'])) { //The attribute of the last(0th) tag must be moved as well
                         $current[$tag]['0_attr'] = $current[$tag.'_attr'];
                         unset($current[$tag.'_attr']);
@@ -159,7 +159,7 @@ function xml2array($contents, $get_attributes=1, $priority = 'tag') {
 
                     // ...push the new element into that array.
                     $current[$tag][$repeated_tag_index[$tag.'_'.$level]] = $result;
-                    
+
                     if($priority == 'tag' and $get_attributes and $attributes_data) {
                         $current[$tag][$repeated_tag_index[$tag.'_'.$level] . '_attr'] = $attributes_data;
                     }
@@ -170,11 +170,11 @@ function xml2array($contents, $get_attributes=1, $priority = 'tag') {
                     $repeated_tag_index[$tag.'_'.$level] = 1;
                     if($priority == 'tag' and $get_attributes) {
                         if(isset($current[$tag.'_attr'])) { //The attribute of the last(0th) tag must be moved as well
-                            
+
                             $current[$tag]['0_attr'] = $current[$tag.'_attr'];
                             unset($current[$tag.'_attr']);
                         }
-                        
+
                         if($attributes_data) {
                             $current[$tag][$repeated_tag_index[$tag.'_'.$level] . '_attr'] = $attributes_data;
                         }
@@ -187,7 +187,7 @@ function xml2array($contents, $get_attributes=1, $priority = 'tag') {
             $current = &$parent[$level-1];
         }
     }
-    
+
     return($xml_array);
-}  
+}
 ?>
