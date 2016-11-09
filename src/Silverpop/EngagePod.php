@@ -206,14 +206,14 @@ class EngagePod {
 
     /**
      * Add a contact to a list
-     *
+     * https://kb.silverpop.com/kb/Engage/API/API_XML/XML_API_Developer_Guide/03_Contact_XML_Interfaces/02_Database_Management_Interfaces_-_Contact/01_Add_a_Contact
      */
-    public function addContact($databaseID, $updateIfFound, $columns, $contactListID = false, $sendAutoReply = false, $allowHTML = false) {
+    public function addContact($databaseID, $updateIfFound, $columns, $contactListID = false, $sendAutoReply = false, $allowHTML = false, $created_from = 1) {
         $data["Envelope"] = array(
             "Body" => array(
                 "AddRecipient" => array(
                     "LIST_ID" => $databaseID,
-                    "CREATED_FROM" => 1,         // 1 = created manually, 2 = opted in
+                    "CREATED_FROM" => $created_from,
                     "SEND_AUTOREPLY"  => ($sendAutoReply ? 'true' : 'false'),
                     "UPDATE_IF_FOUND" => ($updateIfFound ? 'true' : 'false'),
                     "ALLOW_HTML" => ($allowHTML ? 'true' : 'false'),
