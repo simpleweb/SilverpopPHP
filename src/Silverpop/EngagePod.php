@@ -208,7 +208,7 @@ class EngagePod {
      * Add a contact to a list
      * https://kb.silverpop.com/kb/Engage/API/API_XML/XML_API_Developer_Guide/03_Contact_XML_Interfaces/02_Database_Management_Interfaces_-_Contact/01_Add_a_Contact
      */
-    public function addContact($databaseID, $updateIfFound, $columns, $contactListID = false, $sendAutoReply = false, $allowHTML = false, $createdFrom = 1) {
+    public function addContact($databaseID, $updateIfFound, $columns, $contactListID = false, $sendAutoReply = false, $allowHTML = false, $createdFrom = 1, $visitorKey = '', $syncFields = []) {
         $data["Envelope"] = array(
             "Body" => array(
                 "AddRecipient" => array(
@@ -217,6 +217,7 @@ class EngagePod {
                     "SEND_AUTOREPLY"  => ($sendAutoReply ? 'true' : 'false'),
                     "UPDATE_IF_FOUND" => ($updateIfFound ? 'true' : 'false'),
                     "ALLOW_HTML" => ($allowHTML ? 'true' : 'false'),
+                    "VISITOR_KEY" => $visitorKey,
                     "CONTACT_LISTS" => ($contactListID) ? array("CONTACT_LIST_ID" => $contactListID) : '',
                     "COLUMN" => array(),
                 ),
@@ -224,6 +225,9 @@ class EngagePod {
         );
         foreach ($columns as $name => $value) {
             $data["Envelope"]["Body"]["AddRecipient"]["COLUMN"][] = array("NAME" => $name, "VALUE" => $value);
+        }
+        foreach ($syncFields as $name => $value) {
+            $data["Envelope"]["Body"]["AddRecipient"]["SYNC_FIELDS"]["SYNC_FIELD"][] = array("NAME" => $name, "VALUE" => $value);
         }
         $response = $this->_request($data);
         $result = $response["Envelope"]["Body"]["RESULT"];
@@ -329,19 +333,23 @@ class EngagePod {
      * @throws \Exception
      * @return int recipient ID
      */
-    public function updateContact($databaseID, $oldEmail, $columns) {
+    public function updateContact($databaseID, $oldEmail, $columns, $visitorKey = '', $syncFields = []) {
         $data["Envelope"] = array(
             "Body" => array(
                 "UpdateRecipient" => array(
                     "LIST_ID"         => $databaseID,
                     "OLD_EMAIL"       => $oldEmail,
                     "CREATED_FROM"    => 1,        // 1 = created manually
+                    "VISITOR_KEY"     => $visitorKey,
                     "COLUMN" => array(),
                 ),
             ),
         );
         foreach ($columns as $name => $value) {
             $data["Envelope"]["Body"]["UpdateRecipient"]["COLUMN"][] = array("NAME" => $name, "VALUE" => $value);
+        }
+        foreach ($syncFields as $name => $value) {
+            $data["Envelope"]["Body"]["AddRecipient"]["SYNC_FIELDS"]["SYNC_FIELD"][] = array("NAME" => $name, "VALUE" => $value);
         }
         $response = $this->_request($data);
         $result = $response["Envelope"]["Body"]["RESULT"];
