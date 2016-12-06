@@ -242,6 +242,27 @@ class EngagePod {
         }
     }
 
+    public function addContactToContactList($contactId, $contactListId, $columns) {
+        $data["Envelope"] = array(
+            "Body" => array(
+                "AddContactToContactList" => array(
+                    "CONTACT_ID" => $contactId,
+                    "CONTACT_LIST_ID" => $contactListId,
+                ),
+            ),
+        );
+        foreach ($columns as $name => $value) {
+            $data["Envelope"]["Body"]["AddContactToContactList"]["COLUMN"][] = array("NAME" => $name, "VALUE" => $value);
+        }
+        $response = $this->_request($data);
+        $result = $response["Envelope"]["Body"]["RESULT"];
+        if ($this->_isSuccess($result)) {
+            return true;
+        } else {
+            throw new \Exception("AddRecipient Error: ".$this->_getErrorFromResponse($response));
+        }
+    }
+
     public function getContact($databaseID, $email = null, $recipientId = null, $encodedRecipientId = null , $returnContactLists = false, $columns = null)
     {
 
