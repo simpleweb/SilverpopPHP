@@ -2,7 +2,7 @@
 
 namespace Silverpop;
 
-use Silverpop\Util\ArrayToXML;
+use Silverpop\Util\ArrayToXml;
 
 class Transact {
 
