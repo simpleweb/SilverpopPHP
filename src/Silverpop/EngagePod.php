@@ -178,29 +178,32 @@ class EngagePod {
     }
 
     /**
-     * Remove a contact
+     * Remove a contact using the database id or a list id
      *
+     * @param $databaseID
+     * @param $email
+     * @param array $columns
+     * @return bool
+     * @throws \Exception
      */
-    public function removeContact($databaseID, $email, $customer_id) {
+    public function removeContact($databaseID, $email, $columns = array()) {
         $data["Envelope"] = array(
             "Body" => array(
                 "RemoveRecipient" => array(
                     "LIST_ID" => $databaseID,
                     "EMAIL" => $email,
-                    "COLUMN" => array(array("NAME"=>"customer_id", "VALUE"=>$customer_id)),
                 ),
             ),
         );
+        foreach ($columns as $name => $value) {
+            $data["Envelope"]["Body"]["AddRecipient"]["COLUMN"][] = array("NAME" => $name, "VALUE" => $value);
+        }
         $response = $this->_request($data);
         $result = $response["Envelope"]["Body"]["RESULT"];
         if ($this->_isSuccess($result)) {
             return true;
         } else {
-            if ($response["Envelope"]["Body"]["Fault"]["FaultString"]=="Error removing recipient from list. Recipient is not a member of this list."){
-                return true;
-            } else {
-                throw new \Exception("Silverpop says: ".$response["Envelope"]["Body"]["Fault"]["FaultString"]);
-            }
+            throw new \Exception("RemoveRecipient says: ".$this->_getErrorFromResponse($response));
         }
     }
 
