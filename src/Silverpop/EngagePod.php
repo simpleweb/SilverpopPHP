@@ -760,6 +760,89 @@ class EngagePod {
     }
 
     /**
+     * Exports contact data from a database, query, or contact list. Engage exports the results to a CSV
+     * file, then adds that file to the FTP account associated with the current session.
+     *
+     * @param string $listId Unique identifier for the database, query, or contact list Engage is exporting.
+     * @param string $exportType Specifies which contacts to export.
+     * @param string $exportFormat Specifies the format (file type) for the exported data.
+     * @param array $exportColumns XML node used to request specific custom database columns to export for each contact. If EXPORT_COLUMNS is not specified, all database columns will be exported.
+     * @param null|string $email If specified, this email address receives notification when the job is complete.
+     * @param null|string $fileEncoding Defines the encoding of the exported file.
+     * @param bool $addToStoredFiles Use the ADD_TO_STORED_FILES parameter to write the output to the Stored Files folder within Engage.
+     * @param null|string $dateStart Specifies the beginning boundary of information to export (relative to the last modified date). If time is included, it must be in 24-hour format.
+     * @param null|string $dateEnd Specifies the ending boundary of information to export (relative to the last modified date). If time is included, it must be in 24-hour format.
+     * @param bool $useCreatedDate If included, the DATE_START and DATE_END range will be relative to the contact create date rather than last modified date.
+     * @param bool $includeLeadSource Specifies whether to include the Lead Source column in the resulting file.
+     * @param null|string $listDateFormat Used to specify the date format of the date fields in your exported file if date format differs from "mm/dd/yyyy" (month, day, and year can be in any order you choose).
+     * @return mixed
+     * @throws \Exception
+     */
+    public function exportList($listId, $exportType, $exportFormat, $exportColumns = array(), $email = null, $fileEncoding = null, $addToStoredFiles = false, $dateStart = null, $dateEnd = null, $useCreatedDate = false, $includeLeadSource = false, $listDateFormat = null)
+    {
+        $data["Envelope"] = array(
+            "Body" => array(
+                "ExportList" => array(
+                    "LIST_ID" => $listId,
+                    "EXPORT_TYPE" => $exportType,
+                    "EXPORT_FORMAT" => $exportFormat
+                )
+            )
+        );
+
+        if ($exportColumns) {
+            foreach ($exportColumns as $column) {
+                $data["Envelope"]["Body"]["ExportList"]["EXPORT_COLUMNS"]["COLUMN"][] = $column;
+            }
+        }
+
+        if ($email) {
+            $data["Envelope"]["Body"]["ExportList"]["EMAIL"] = $email;
+        }
+
+        if ($fileEncoding) {
+            $data["Envelope"]["Body"]["ExportList"]["FILE_ENCODING"] = $fileEncoding;
+        }
+
+        if ($addToStoredFiles) {
+            $data["Envelope"]["Body"]["ExportList"]["ADD_TO_STORED_FILES"] = "";
+        }
+
+        if ($dateStart) {
+            $data["Envelope"]["Body"]["ExportList"]["DATE_START"] = $dateStart;
+        }
+
+        if ($dateEnd) {
+            $data["Envelope"]["Body"]["ExportList"]["DATE_END"] = $dateEnd;
+        }
+
+        if ($useCreatedDate) {
+            $data["Envelope"]["Body"]["ExportList"]["USE_CREATED_DATE"] = "";
+        }
+
+        if ($includeLeadSource) {
+            $data["Envelope"]["Body"]["ExportList"]["INCLUDE_LEAD_SOURCE"] = "";
+        }
+
+        if ($listDateFormat) {
+            $data["Envelope"]["Body"]["ExportList"]["LIST_DATE_FORMAT"] = $listDateFormat;
+        }
+
+        $response = $this->_request($data);
+        $result = $response["Envelope"]["Body"]["RESULT"];
+
+        if ($this->_isSuccess($result)) {
+            if (isset($result['JOB_ID']))
+                return array("JOB_ID" => $result['JOB_ID'], "FILE_PATH" => $result['FILE_PATH']);
+            else {
+                throw new \Exception('Export list created but no job ID was returned from the server.');
+            }
+        } else {
+            throw new \Exception("exportList Error: ".$this->_getErrorFromResponse($response));
+        }
+    }
+
+    /**
      * Get a data job status
      *
      * Returns the status or throws an exception
