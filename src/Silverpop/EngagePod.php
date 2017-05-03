@@ -841,11 +841,9 @@ class EngagePod {
             $xml = $data;
         }
 
-        $fields = array(
-            "jsessionid" => isset($this->_jsessionid) ? $this->_jsessionid : '',
-            "xml" => $xml,
-        );
-        $response = $this->_httpPost($fields);
+        $jsessionid = isset($this->_jsessionid) ? $this->_jsessionid : '';
+        
+        $response = $this->_httpPost($jsessionid, $xml);
         if ($response) {
             $arr =  \Silverpop\Util\xml2array($response);
             if (isset($arr["Envelope"]["Body"]["RESULT"]["SUCCESS"])) {
@@ -862,19 +860,19 @@ class EngagePod {
      * Private method: post the request to the url
      *
      */
-    private function _httpPost($fields) {
-        $fields_string = http_build_query($fields);
+    private function _httpPost($jsessionid, $xml) {
         //open connection
         $ch = curl_init();
 
         //set the url, number of POST vars, POST data
-        curl_setopt($ch,CURLOPT_HTTPHEADER, array('Expect:'));
-        curl_setopt($ch,CURLOPT_URL,$this->_getFullUrl());
-        curl_setopt($ch,CURLOPT_POST,count($fields));
-        curl_setopt($ch,CURLOPT_POSTFIELDS,$fields_string);
+		curl_setopt($ch,CURLOPT_HTTPHEADER, array('Expect:'));
+        curl_setopt($ch,CURLOPT_URL,$this->_getFullUrl().'?jsessionid='.$jsessionid);
+        curl_setopt($ch,CURLOPT_POSTFIELDS,$xml);
         curl_setopt($ch,CURLOPT_RETURNTRANSFER,true);
-        curl_setopt($ch,CURLOPT_HTTPHEADER,array (
-   "Content-Type: application/x-www-form-urlencoded; charset=utf-8" ));
+        curl_setopt($ch,CURLOPT_HTTPHEADER, array(
+	        'Content-Type: text/xml;charset=UTF-8',
+	        'Content-Length: '.strlen($xml)
+        ));
 
         //execute post
         $result = curl_exec($ch);
