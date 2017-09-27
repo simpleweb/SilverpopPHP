@@ -290,7 +290,7 @@ class EngagePod {
             "VALUE" => $columns[$key],
           );
         }
-        $data["Envelope"]["Body"]["SelectRecipeientData"]["COLUMN"] = $column_data;
+        $data["Envelope"]["Body"]["SelectRecipientData"]["COLUMN"] = $column_data;
       }
 
         $response = $this->_request($data);
