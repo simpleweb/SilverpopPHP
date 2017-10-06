@@ -370,7 +370,7 @@ class EngagePod {
             $data["Envelope"]["Body"]["UpdateRecipient"]["COLUMN"][] = array("NAME" => $name, "VALUE" => $value);
         }
         foreach ($syncFields as $name => $value) {
-            $data["Envelope"]["Body"]["AddRecipient"]["SYNC_FIELDS"]["SYNC_FIELD"][] = array("NAME" => $name, "VALUE" => $value);
+            $data["Envelope"]["Body"]["UpdateRecipient"]["SYNC_FIELDS"]["SYNC_FIELD"][] = array("NAME" => $name, "VALUE" => $value);
         }
         $response = $this->_request($data);
         $result = $response["Envelope"]["Body"]["RESULT"];
