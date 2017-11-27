@@ -181,16 +181,22 @@ class EngagePod {
      * Remove a contact
      *
      */
-    public function removeContact($databaseID, $email, $customer_id) {
+    public function removeContact($databaseID, $email, $customer_id=false) {
         $data["Envelope"] = array(
             "Body" => array(
                 "RemoveRecipient" => array(
                     "LIST_ID" => $databaseID,
                     "EMAIL" => $email,
-                    "COLUMN" => array(array("NAME"=>"customer_id", "VALUE"=>$customer_id)),
                 ),
             ),
         );
+        /*
+         * This should be optional because not every database will have a 'customer_id' key field.
+         */
+        if ( $customer_id !== FALSE ) {
+            $data['Envelope']['Body']['RemoveRecipient']['COLUMN'][] = array("NAME"=>"customer_id", "VALUE"=>$customer_id);
+        }
+
         $response = $this->_request($data);
         $result = $response["Envelope"]["Body"]["RESULT"];
         if ($this->_isSuccess($result)) {
