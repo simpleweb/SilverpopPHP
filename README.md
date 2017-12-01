@@ -1,6 +1,10 @@
 # Silverpop PHP Client Library
 
-PHP client library for the Silverpop API
+PHP client library for the Silverpop API.
+
+*Note*. This project is not actively maintained. I suggest if it is useful, you fork your own version of it.
+
+Pull requests that are non-breaking will be merged.
 
 ## Installation
 
