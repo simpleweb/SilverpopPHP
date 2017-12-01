@@ -872,15 +872,17 @@ class EngagePod {
         $fields_string = http_build_query($fields);
         //open connection
         $ch = curl_init();
-
+        //set headers in array
+        $headers = array(
+         'Expect:',
+         'Content-Type: application/x-www-form-urlencoded; charset=utf-8',
+        );
         //set the url, number of POST vars, POST data
-        curl_setopt($ch,CURLOPT_HTTPHEADER, array('Expect:'));
+        curl_setopt($ch,CURLOPT_HTTPHEADER, $headers);
         curl_setopt($ch,CURLOPT_URL,$this->_getFullUrl());
         curl_setopt($ch,CURLOPT_POST,count($fields));
         curl_setopt($ch,CURLOPT_POSTFIELDS,$fields_string);
         curl_setopt($ch,CURLOPT_RETURNTRANSFER,true);
-        curl_setopt($ch,CURLOPT_HTTPHEADER,array (
-   "Content-Type: application/x-www-form-urlencoded; charset=utf-8" ));
 
         //execute post
         $result = curl_exec($ch);
