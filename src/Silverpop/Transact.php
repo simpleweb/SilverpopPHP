@@ -89,7 +89,7 @@ class Transact {
 
         if (is_array($data))
         {
-            $atx = new ArrayToXML($data, $replace, $attribs);;
+            $atx = new ArrayToXml($data, $replace, $attribs);;
             $xml = $atx->getXML();
         }
         else
