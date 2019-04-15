@@ -179,9 +179,13 @@ class EngagePod {
 
     /**
      * Remove a contact
+     * @param string $databaseID
+     * @param string $email
+     * @param mixed $sync_fields boolean false if not used or associative array of sync fields.
      *
+     * @return bool
      */
-    public function removeContact($databaseID, $email, $customer_id=false) {
+    public function removeContact($databaseID, $email, $sync_fields=false) {
         $data["Envelope"] = array(
             "Body" => array(
                 "RemoveRecipient" => array(
@@ -191,10 +195,13 @@ class EngagePod {
             ),
         );
         /*
-         * This should be optional because not every database will have a 'customer_id' key field.
+         * Sync fields are optional so users can target recipients that do not have the EMAIL unique key or no unique keys at all.
          */
-        if ( $customer_id !== FALSE ) {
-            $data['Envelope']['Body']['RemoveRecipient']['COLUMN'][] = array("NAME"=>"customer_id", "VALUE"=>$customer_id);
+        if ( $sync_fields !== FALSE ) {
+            foreach ( $sync_fields as $key => $value ) {
+                $data['Envelope']['Body']['RemoveRecipient']['COLUMN'][] = array("NAME"=> $key , "VALUE"=> $sync_fields[$key] );
+            }
+
         }
 
         $response = $this->_request($data);
