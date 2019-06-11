@@ -30,7 +30,7 @@ class EngagePod {
 
         // It would be a good thing to cache the jsessionid somewhere and reuse it across multiple requests
         // otherwise we are authenticating to the server once for every request
-        $this->_baseUrl = 'http://api' . $config['engage_server'] . '.silverpop.com/XMLAPI';
+        $this->_baseUrl = 'https://api' . $config['engage_server'] . '.silverpop.com/XMLAPI';
         $this->_login($config['username'], $config['password']);
 
     }
@@ -93,11 +93,13 @@ class EngagePod {
      * Get mailing templates
      *
      */
-    public function getMailingTemplates($isPrivate = true) {
+    public function getMailingTemplates($isPrivate = true, $startDate, $endDate) {
         $data["Envelope"] = array(
             "Body" => array(
                 "GetMailingTemplates" => array(
                     "VISIBILITY" => ($isPrivate ? '0' : '1'),
+                    "LAST_MODIFIED_START_DATE" => $startDate,
+                    "LAST_MODIFIED_END_DATE" => $endDate,
                 ),
             ),
         );
@@ -113,6 +115,80 @@ class EngagePod {
             throw new \Exception("GetLists Error: ".$this->_getErrorFromResponse($response));
         }
     }
+
+  /**
+   * Get a specific mailing template.
+   *
+   * @param $mailingID
+   * @return mixed
+   * @throws \Exception
+   */
+  public function getMailingTemplate($mailingID) {
+    $data["Envelope"] = array(
+      "Body" => array(
+        "PreviewMailing" => array(
+          "MailingId" => $mailingID
+        ),
+      ),
+    );
+    $response = $this->_request($data);
+    return $response["Envelope"]["Body"]["RESULT"];
+  }
+
+  /**
+   * Get all the sent mails for an organization.
+   *
+   * @param string $startDate
+   *   Date string acceptable to strtotime.
+   * @param string $endDate
+   *   Date string acceptable to strtotime.
+   *
+   * @return array
+   * @throws \Exception
+   */
+  public function getSentMailingsForOrg($startDate = 'a week ago', $endDate = 'now') {
+    $data["Envelope"] = array(
+      "Body" => array(
+        'GetSentMailingsForOrg' => array(
+          'SENT' => '1',
+          "DATE_START" => date('m/d/Y H:i:s', strtotime($startDate)),
+          "DATE_END" => date('m/d/Y H:i:s', strtotime($endDate)),
+          "SHARED" => '1',
+          "EXCLUDE_ZERO_SENT" => '1',
+          "EXCLUDE_TEST_MAILINGS" => '1',
+        ),
+      )
+    );
+
+    $response = $this->_request($data);
+    return $response["Envelope"]["Body"]["RESULT"]['Mailing'];
+  }
+
+
+  /**
+   * Get all the sent mails for an organization.
+   *
+   * @param int $mailingID
+   *   Integer for mailing id.
+   * @param int $reportID
+   *   Report id.
+   *
+   * @return array
+   * @throws \Exception
+   */
+  public function getAggregateTrackingForMailing($mailingID, $reportID) {
+      $data["Envelope"] = array(
+        "Body" => array(
+          'GetAggregateTrackingForMailing' => array(
+            'MAILING_ID' => $mailingID,
+            "REPORT_ID" => $reportID,
+          ),
+        )
+      );
+
+      $response = $this->_request($data);
+      return $response["Envelope"]["Body"]["RESULT"]['Mailing'];
+  }
 
     /**
      * Calculate a query
@@ -771,6 +847,57 @@ class EngagePod {
         }
 
     }
+
+  /**
+   * Import a list/database
+   *
+   * Requires a file to import and a mapping file to be in the 'upload' directory of the Engage FTP server
+   *
+   * $listID int
+   *   ID of the list
+   * $date_start string
+   * $date_end string
+   * $parameters array
+   *   Array of optional parameters, possibly including
+   *   - export_type ALL|UNDELIVERABLE|OPT_IN|OPT_OUT (default ALL)
+   *   - export_format CSV|TAB|PIPE (default csv)
+   *   - file_encoding utf-8|iso-8859-1 (default = org default)
+   *   - add_to_stored_files bool (default false)
+   * ....
+   *
+   */
+  public function exportList($listID) {
+
+    $data["Envelope"] = array(
+      "Body" => array(
+        "ExportList" => array(
+          "LIST_ID" => $listID,
+          "EXPORT_TYPE" => 'ALL',
+          "EXPORT_FORMAT" => 'CSV',
+          "DATE_START" => '04/25/2017 12:12:11',
+          "USE_CREATED_DATE" => 1,
+          "EXPORT_COLUMNS" => array("Email","Opt In Date","Opted Out","Opt In Details","Email Type","Opted Out Date","Opt Out Details","20151203_Amount","20151203_AmountDouble","AOL_2017_Program","ContactID","ContributionID","IsoLang","LastClickDate","LastOpenDate","LastSentDate","Segment","Segment_AOL","Segment_Newsletter","Segment_Newsletter2","SendHour","bannerInfo_country","bannerInfo_language","bannerInfo_segment","bannerInfo_source","bannerInfo_submitDate","country","donation_count","firstname","highest_donation_date","highest_native_amount","highest_native_currency","highest_usd_amount","is_2006_donor","is_2007_donor","is_2008_donor","is_2009_donor","is_2010_donor","is_2011_donor","is_2012_donor","is_2013_donor","is_2014_donor","lastname","latest_currency","latest_donation_date","latest_native_amount","latest_usd_amount","lifetime_usd_total","pm_method","postal_code","rml_country","rml_device","rml_language","rml_phone","rml_segment","rml_source","rml_submitDate","state","timezone",
+
+          ),
+        ),
+      ),
+    );
+
+
+    $response = $this->_request($data);
+    $result = $response["Envelope"]["Body"]["RESULT"];
+
+    if ($this->_isSuccess($result)) {
+      if (isset($result['FILE_PATH']))
+        return $result['FILE_PATH'];
+      else {
+        throw new \Exception('Export list query created but no job ID was returned from the server.');
+      }
+    } else {
+      throw new \Exception("importList Error: ".$this->_getErrorFromResponse($response));
+    }
+
+  }
 
     /**
      * Exports contact data from a database, query, or contact list. Engage exports the results to a CSV
