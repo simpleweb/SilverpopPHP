@@ -23,7 +23,7 @@ class Transact {
      * Sets $this->_baseUrl based on the engage server specified in config
      */
     public function __construct($engage_server) {
-        $this->_baseUrl = 'http://transact' . $engage_server . '.silverpop.com/XTMail';
+        $this->_baseUrl = 'https://transact' . $engage_server . '.goacoustic.com/XTMail';
     }
 
     /**
